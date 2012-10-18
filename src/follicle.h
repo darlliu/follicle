@@ -39,6 +39,7 @@ namespace fol
             void cur_antagonists (unsigned int pathway_num, double * io);
             void cur_receptors (unsigned int pathway_num, double * io );
             void cur_active_receptors (unsigned int pathway_num, double * io);
+            
 
             double * all_ligands (unsigned int pathway_num) {return ligands[pathway_num];};
             double * all_antagonists (unsigned int pathway_num) {return antagonists[pathway_num];};
@@ -46,8 +47,17 @@ namespace fol
             double * all_active_receptors (unsigned int pathway_num){return active_receptors[pathway_num];};
 
             /* ====================  MUTATORS      ======================================= */
-            void evolve (); // all the local operations (determine state, birth and decay, noise)
-
+            void evolve (); 
+            // set the new state depending on our metric
+            
+            void set_next_ligands (unsigned int pathway_num, double *in);
+            void set_next_antagonists (unsigned int pathway_num, double *in);
+            void set_next_receptors (unsigned int pathway_num, double *in);
+            void set_next_active_receptors (unsigned int pathway_num, double *in);
+            
+            void generate_noise (double *mean_n, double *var_n, pathway_num);
+            // given the guassian mean and variance of noise,
+            // and the pathway number
             /* ====================  OPERATORS     ======================================= */
 
         protected:
@@ -58,18 +68,16 @@ namespace fol
             unsigned int num_path; //total number of pathways
             std::vector<unsigned int> num_lig, num_ang, num_receptor;
                                // number of ligands, antagonists, receptors
-            int* path_type;     // pathway types
+            double* path_type;     // pathway types, positive has greater than zero
             bool major;         // whether to output data row major or column major
             unsigned int index; // index of follicle, convertible to (x, y)
                                 // note: this shall become the element number (reordered) if meshed
 
             unsigned int rowl, coll; // row and column length of the grid
             states * state; // states if each cycle of this follicle
-            std::vector<double*> I, D, ligands, antagonists, receptors, active_receptors;  
+            std::vector<double*> ligands, ligands_noise, antagonists, antagonists_noise, receptors, active_receptors;  
             // synthesis, decay, ligand concentration (final), activator, receptor and receptor bound conc.
             // if more than one species per pathway then the species will be collapsed columnwise
-            double I_n[2], D_n[2], ligands_n[2],antagonists_n[2], receptors_n[2], active_receptors_n[2];  
-            // the guassian mean and var of noise in each term
             
 
         private:
