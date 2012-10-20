@@ -7,8 +7,9 @@ x=linspace (0,1,N);
 u=zeros(N,1);
 u(1)=0.001;
 v=u;
+w=v;
 % discritize N pts along x
-M=10000;
+M=20000;
 M2=M;
 dt=0.01; %discritize time;
 U=zeros(N,M);
@@ -16,21 +17,22 @@ V=U;
 %result matrix
 t=0:dt:dt*(M2-1);
 %time vector
-tnow=0;
+
 n=1;
 toplot=ones(1,M);
 for i= 2: M,
-    [gu,gv]=gen(u,v, n);
+    [gu,gv,w(i)]=gen(u,v, w(i-1),dt,1/N);
     u=step(u,dt,N,gu);
     v=step(v,dt,N,gv);
     U(:,i)=u;
     V(:,i)=v;
-    n=next(u,v,n);
     toplot(i)=n;
 end
+figure
+plot(t,log(abs(sum(U))),t,log(abs(sum(V))),t,log(abs(w)));
 
-
-fig1=figure(1);
+legend('BMP','wnt')
+fig1=figure;
 plot(x,U(:,1),x,V(:,1))
 legend('BMP','wnt')
  windowsize=get(fig1,'Position');
@@ -61,19 +63,13 @@ end
 
     
 
-function [gu,gv]=gen (u,v,n)
-gu=u(n)*(1-1*v(n));
-gv=-v(n)*(1-1*u(n));
-return
+function [gu,gv,gw]=gen (u,v,w,dt,dx)
+gu=(1/w)*(1-0.1*sum(v)*dx);
 
-function nnext=next(u,v,nprev)
-nnext=ceil((v(nprev)-u(nprev))+nprev)
-if nnext<=0,
-    nnext=1;
-end
-if nnext>20,
-    nnext=20;
-end
+gv=(1/w)*(1-0.1*w*dx);
+
+gw=(1-0.1*sum(u)*dx)*dt+w;
+
 return
 
 function unext=step (u, dt, N,generated)
@@ -89,9 +85,13 @@ D(N,N-2)=1;
 
 F=zeros(N,1);
 F(1)=generated/dx; 
+F(N)=-1/dx;
 %F(0) is the source of diffusion.
 I=eye(N,N);
 unext =(I-(dt/dx^2)*D)\(u+ dt*F);
 %unext=(D*u+F).*(dt/dx^2);
 
 return
+
+
+
