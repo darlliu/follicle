@@ -25,10 +25,10 @@ flag=0;
 toplot=ones(1,M);
 for i= 2: M,
     [gu,gv,gw,gy]=gen(u,v, w, y,n);
-    u=step(u,w,dt,4,gu,N);
+    u=step(u,w,dt,3,gu,N);
     w=step(w,u,dt,n,gw,N);
     v=step(v,y,dt,n,gv,N);
-    y=step(y,v,dt,4,gy,N);
+    y=step(y,v,dt,3,gy,N);
     U(:,i)=u;
     W(:,i)=w;
     V(:,i)=v;
@@ -79,9 +79,9 @@ return
     
 
 function [gu,gv,gw,gy]=gen (u,v,w,y,n)
-gu=0.04*u(n)^2/(1+u(n)^2);
+gu=0.05*u(n)^2/(1+u(n)^2);
 
-gw=0.05*w(n)^2/(1+w(n)^2);
+gw=0.04*w(n)^2/(1+w(n)^2);
 
 gv=0.005*v(n)^2/(1+v(n)^2);
 
@@ -100,17 +100,13 @@ D(N-1,N-1)=-1;
 D(N,N)=0;
 D(N,N-1)=-1;
 D(N,N-2)=1;
-D(n,n)=-1;
-D(n-1,n-1)=-1;
-D(n,n+1)=1;
-D(n-1,n-2)=1;
 D=D*0.01;
 %D with mixed neumann condition
 F=zeros(N,1);
-F(n)=gu/dx;
+F(n)=gu;
 %F(0) is the source of diffusion.
 I=eye(N,N);
-R=-0.5*(u.*w./(1+u.*w)).*u-0.5*u;
+R=-0.005*(u.*w./(1+u.*w)).*u-0.005*u;
 u =(I-(dt/dx^2)*D)\(u+dt*F+R*dt);
 %unext=(D*u+F).*(dt/dx^2);
 return
