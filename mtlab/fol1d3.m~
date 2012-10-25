@@ -12,7 +12,7 @@ v=u;
 w=v;
 y=w;
 % discritize N pts along x
-M=80000;
+M=40000;
 M2=M;
 dt=0.002; %discritize time;
 U=zeros(N,M);
@@ -45,8 +45,8 @@ end
 figure
 plot(toplot)
 figure
-plot(t,U(7,:),t,V(7,:),t,W(7,:),t,Y(7,:));
-legend('BMP','WNT','Noggin','Dkk')
+plot(t,U(7,:),t,V(7,:));
+legend('BMP','WNT')
 
 
 fig1=figure;

@@ -7,7 +7,7 @@ if cnt>1,
 else
     cnt=1000;
 end
-if flag==0 && n==7 && (u(7)<1.3E-3 && v(7)>5E-3),
+if flag==0 && n==7 && (u(7)<1.2E-3 && v(7)>1.9E-3),
     n=n+1;
     flagout=flag;
     nout=n;
