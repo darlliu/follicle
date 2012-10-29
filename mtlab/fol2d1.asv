@@ -1,11 +1,11 @@
-function [U,V,Y,W, Is]= fol2d1
+function fol2d1
 clc
 close all
 M=20; %discritize y
 N=15; %discritize x
 dx=1/M/N;
 % Note: even though M, N is set here, they cannot be changed
-dt=0.005; % must use backward euler, dt should be ?
+dt=0.01; % must use backward euler, dt should be ?
 Is=5000; %discrete time pts
 Src= [1+6*N, 1+11*N, 1+16*N]; %source 1 (stem cell level)
 src=[1 6; 1 11; 1 16];
@@ -34,11 +34,11 @@ for i = 2:Is,
     counter=counter-1;
     if counter==1,
         [ends(1,2) ends(1,1) flag(1)]= ...
-            growth2d(M,N,ends(1,2),ends(1,1),u, w, src(1,2), src(1,1), 2E-4, 1E-6, flag(1));
+            growth2d(M,N,ends(1,2),ends(1,1),u, w, src(1,2), src(1,1), 1, 0.00001, flag(1));
         [ends(2,2) ends(2,1) flag(2)]= ...
-            growth2d(M,N,ends(2,2),ends(2,1),u, w, src(2,2), src(2,1), 2E-4, 1E-6, flag(2));
+            growth2d(M,N,ends(2,2),ends(2,1),u, w, src(2,2), src(2,1), 1, 0.00001, flag(2));
         [ends(3,2) ends(3,1) flag(3)]= ...
-            growth2d(M,N,ends(3,2),ends(3,1),u, w, src(3,2), src(3,1), 2E-4, 1E-6, flag(3));  
+            growth2d(M,N,ends(3,2),ends(3,1),u, w, src(3,2), src(3,1), 1, 0.00001, flag(3));  
         counter=100;
         ends
     end
@@ -62,18 +62,13 @@ end
 figure
 % first, growth functions
 % second, concentration vs t at shg
-subplot(2,1,1)
 Src=src(:,1)+(src(:,2)+3-1)*N;
-plot(t,U(Src(1),:),t,U(Src(2),:),t,U(Src(3),:) ...
-    );
-legend('BMP, 1','BMP, 2','BMP,3 ');
-subplot(2,1,2)
-plot(t,V(Src(1),:),t,V(Src(2),:),t,V(Src(3),:) ...
-    );
-legend('Wnt, 1','Wnt, 2','Wnt,3 ');
-
+plot(t,U(Src(1),:), t,V(Src(1),:),t,U(Src(2),:),t,V(Src(2),:),t,U(Src(3),:) ...
+    ,t, V(Src(3),:));
+legend('BMP, 1','Wnt, 1','BMP, 2','Wnt, 2','BMP,3 ','Wnt, 3');
 title ('concentration at stem cell vs time')
 
+makemovie (M,N,U,Is)
 return
 
 function [gu,gv,gw,gy]=gen (u,v,w,y,n)
@@ -86,7 +81,27 @@ gv=0.005*v(n).^2./(1+v(n).^2)+0.001;
 gy=0.01*y(n).^2./(1+y(n).^2)+0.001;
 
 return
-
+function makemovie (M,N,U,Is)
+%movie
+[X, Y]=meshgrid(linspace(0,1,N), linspace(0,1,M));
+%get grid
+fig1=figure;
+size(X)
+size(U)
+surf(X,Y,reshape(U(:,1), M,N));
+view(0,90)
+windowsize=get(fig1,'Position');
+windowsize(1:2)=[0,0];
+frame=2;
+Movie=moviein(40,fig1,windowsize);
+for i=101:Is/100:Is,
+    surf(X,Y,reshape(U(:,1), M,N));
+    view(0,90)
+    Movie(:,frame)=getframe(fig1,windowsize);
+    frame=frame+1;
+end
+movie(fig1, Movie, 100,3,windowsize);
+return
 
 function u=step (nabla, u , v, dt, dx, Ends, gu, I, O, ds, rs ,des)
 F=O;
