@@ -1,6 +1,6 @@
 function [mout,nout,flag]=growth2d(M,N,m,n,u,v,sourcem,sourcen,t1,t2,flagin)
-testm=sourcem+2;
-testn=sourcen+2;
+testm=sourcem+3;
+testn=sourcen+3;
 mout=m;
 nout=n;
 flag=flagin;

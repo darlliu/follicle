@@ -1,6 +1,6 @@
 function Movie=makemovie2d (M,N,U,V,Is)
 %movie
-close all
+
 [X, Y]=meshgrid(linspace(0,1,N), linspace(0,1,M));
 %get grid
 fig1=figure;
