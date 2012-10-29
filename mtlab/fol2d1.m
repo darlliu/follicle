@@ -6,7 +6,7 @@ N=15; %discritize x
 dx=1/M/N;
 % Note: even though M, N is set here, they cannot be changed
 dt=0.005; % must use backward euler, dt should be ?
-Is=5000; %discrete time pts
+Is=10000; %discrete time pts
 Src= [1+6*N, 1+11*N, 1+16*N]; %source 1 (stem cell level)
 src=[1 6; 1 11; 1 16];
 U=zeros(M*N, Is); %our dense reactant matrix
@@ -27,7 +27,7 @@ ends=[4 9; 4 14;  4 19];
 flag=[0, 0, 0];
 %growth flags
 
-counter=100;
+counter=500;
 %growth countdown counters;
 nabla=MakeLaplacian2D(N,M);
 for i = 2:Is,
@@ -39,7 +39,7 @@ for i = 2:Is,
             growth2d(M,N,ends(2,2),ends(2,1),u, w, src(2,2), src(2,1), 2E-4, 1E-6, flag(2));
         [ends(3,2) ends(3,1) flag(3)]= ...
             growth2d(M,N,ends(3,2),ends(3,1),u, w, src(3,2), src(3,1), 2E-4, 1E-6, flag(3));  
-        counter=100;
+        counter=500;
         ends
     end
 
