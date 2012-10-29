@@ -9,13 +9,6 @@ x=linspace (0,1,N);
 dx=1/N;
 % distance vector
 % solve in [0,1]
-u=zeros(N,1);
-%prepare temp conc vectors
-n=7;
-u(1)=0.0005;
-u(n)=0.0001;
-%initial conditions, change to whatever.
-v=u;
 
 
 
@@ -25,10 +18,6 @@ M=8000;
 dt=0.005; 
 %discritized time;
 
-U=zeros(N,M);
-V=U;
-
-%total concentration-time matrix of ligands
 
 r1=[0; 0];
 r2=[0; 0];
@@ -51,6 +40,18 @@ Ends=[50 51];
 
 %note: you can change the length of these vectors but remember to change R
 %accordingly
+
+u=zeros(N,1);
+%prepare temp conc vectors
+u(Ends)=1E-5;
+%initial conditions, change to whatever.
+v=u;
+
+U=zeros(N,M);
+U(:,1)=u;
+V=U;
+
+%total concentration-time matrix of ligands
 
 D=MakeLaplacian1D(N);
 % diffusion matrix
@@ -75,7 +76,7 @@ a2=1;
 b1=1;
 b2=1;
 %coupling constants
-d=1E-7;
+d=1E-3;
 %diffusion rate
 
 for i= 2: M,
