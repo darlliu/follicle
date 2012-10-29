@@ -61,15 +61,15 @@ t=0:dt:dt*(M-1);
 
 %parameters:
 
-Rtot1=1E-5;
+Rtot1=1E-3;
 Rtot2=Rtot1;
 %max receptor amount
-kon1=1E-6;
-koff1=1E-6;
-kon2=1E-6;
-koff2=1E-6;
-kdeg1=1E-8;
-kdeg2=1E-8;
+kon1=1;
+koff1=1;
+kon2=1;
+koff2=1;
+kdeg1=1E-3;
+kdeg2=1E-3;
 %rates
 a1=1;
 a2=1;
