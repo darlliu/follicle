@@ -115,6 +115,7 @@ I=eye(N,N);
 %R=zeros(N,1);
 R=-rs*sqrt((w).*u)-des*u;
 u =(I-(dt/dx^2)*D)\(u+dt*F+R*dt);
+u=real(u);
 %unext=(D*u+F).*(dt/dx^2);
 return
 
