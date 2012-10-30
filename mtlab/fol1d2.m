@@ -66,11 +66,12 @@ function unext=step (u, dt, N,generated)
 %backward euler
 dx=1/N;
 D=-2*eye(N,N)+diag(diag(eye(N-1,N-1)),1)+diag(diag(eye(N-1,N-1)),-1);
-D(1,1)=-1;
-D(N-1,N-1)=-1;
-D(N,N)=0;
-D(N,N-1)=-1;
-D(N,N-2)=1;
+%D(1,1)=-1;
+D(1,2)=2;
+%D(N-1,N-1)=-1;
+D(N,N)=-2;
+D(N,N-1)=2;
+%D(N,N-2)=1;
 %D with mixed neumann condition
 
 F=zeros(N,1);
