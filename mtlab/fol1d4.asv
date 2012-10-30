@@ -15,7 +15,7 @@ dx=1/N;
 M=8000;
 % time points
 
-dt=0.05; 
+dt=0.005; 
 %discritized time;
 
 
@@ -64,9 +64,9 @@ t=0:dt:dt*(M-1);
 Rtot1=1E-3;
 Rtot2=Rtot1;
 %max receptor amount
-kon1=10;
+kon1=1;
 koff1=1;
-kon2=10;
+kon2=1;
 koff2=1;
 kdeg1=1E-3;
 kdeg2=1E-3;
@@ -86,8 +86,8 @@ for i= 2: M,
     [gu2,gv2]=gen(r1,r2,a1,a2,b1,b2,Ends,N,dt);
     U(:,i)=step(d,D,u,gu+gu2,dx,dt,N);
     V(:,i)=step(d,D,v,gv+gv2,dx,dt,N);
-    R1(:,i)=step2(u,r1,Rtot1,kon1,koff1,kdeg1,Rec,dt);
-    R2(:,i)=step2(v,r2,Rtot2,kon2,koff2,kdeg2,Rec,dt);
+    R1(:,i)=step2(u,r1,Rtot1,kon1,koff1,kdeg1,Rec);
+    R2(:,i)=step2(v,r2,Rtot2,kon2,koff2,kdeg2,Rec);
     u=U(:,i);
     v=V(:,i);
     r1=R1(:,i);
@@ -145,8 +145,8 @@ return
 function [gu2,gv2]=gen(r1,r2,a1,a2,b1,b2,Ends,N,dt)
 gu2=zeros(N,1);
 gv2=gu2;
-gu2(Ends)=dt*(sum(r1)*(a1-b1*sum(r2)));
-gv2(Ends)=dt*(sum(r1)*(b2*sum(r2)-a2));
+gu2(Ends)=dt*((a1*(sum(r1))*(1-a2*sum(r2)))+1E-4);
+gv2(Ends)=dt*((b1*(sum(r2)*(1-b2*sum(r2))))+1E-4);
 return
 
 
@@ -155,9 +155,9 @@ I=eye(N-1,N-1);
 
 %R=zeros(N,1);
 u(1:N-1) =(I-d*(dt/dx^2)*D)\(u(1:N-1)+F(1:N-1));
-
+u=real(u);
 return
 
-function r=step2(u,r,rtot,kon,koff,kdeg,Rec,dt)
-r=(kon*u(Rec).*(rtot-r)-(koff+kdeg)*r)*dt+r;
+function r=step2(u,r,rtot,kon,koff,kdeg,Rec)
+r=kon*u(Rec).*(rtot-r)-(koff+kdeg)*r;
 return
