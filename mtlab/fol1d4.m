@@ -1,6 +1,6 @@
 function fol1d4
 % predator prey model v1
-
+% note: does not show good dynamics at all...
 clc
 close all
 N=200;
@@ -12,10 +12,10 @@ dx=1/N;
 
 
 
-M=8000;
+M=5000;
 % time points
 
-dt=0.05; 
+dt=0.02; 
 %discritized time;
 
 
@@ -71,8 +71,8 @@ koff2=1;
 kdeg1=1E-3;
 kdeg2=1E-3;
 %rates
-a1=1;
-a2=1;
+a1=2;
+a2=2;
 b1=1;
 b2=1;
 %coupling constants
@@ -145,8 +145,8 @@ return
 function [gu2,gv2]=gen(r1,r2,a1,a2,b1,b2,Ends,N,dt)
 gu2=zeros(N,1);
 gv2=gu2;
-gu2(Ends)=dt*(sum(r1)*(a1-b1*sum(r2)));
-gv2(Ends)=dt*(sum(r1)*(b2*sum(r2)-a2));
+gu2(Ends)=dt*(r1.*(a1-b1.*r2));
+gv2(Ends)=dt*(r1.*(b2.*r2)-a2);
 return
 
 
