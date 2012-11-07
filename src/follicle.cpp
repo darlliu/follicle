@@ -17,7 +17,7 @@ namespace fol
         states=new int [cycles];
         for (int i = 0; i<cycles; i++)
         {
-            states[i]=UNKNOWN;
+            states[i]=unknown;
         }// initialize the states
     }
 /*  
