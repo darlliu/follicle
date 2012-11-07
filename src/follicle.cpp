@@ -20,7 +20,7 @@ namespace fol
             states[i]=UNKNOWN;
         }// initialize the states
     }
-
+/*  
     void follicle::cur_ligands (unsigned int pathway_num, double * io)
     {
         if ((sizeof (io)/sizeof (double))!=num_lig[pathway_num] \
@@ -78,7 +78,7 @@ namespace fol
         for (int i = 0; i<num_receptor[pathway_num]; i++)
             io[i]=active_receptors[pathway_num][i+num_receptor[pathway_num]*cycle];
     }
-
+*/
     void follicle::set_next_ligands (unsigned int pathway_num, double * io)
     {
         if ((sizeof (io)/sizeof (double))!=num_lig[pathway_num] \
@@ -98,5 +98,26 @@ namespace fol
 
         for (int i = 0; i<num_lig[pathway_num]; i++)
             ligands[pathway_num][i+num_lig[pathway_num]*cycle]=io[i];
+    }
+
+    void follicle::set_next_ligands (unsigned int pathway_num, double * io)
+    {
+        if ((sizeof (io)/sizeof (double))!=num_ang[pathway_num] \
+                || pathway_num>num_path)
+            throw ("access error: pathway size incorrect");
+        if (antagonists[pathway_num]==NULL)
+            throw ("local storage array size incorrect");
+        if (antagonists[pathway_num][cycle]<0)
+            throw ("Wrong cycle number");
+
+        catch (char* info)
+        {
+            std::cout<<info<<std::endl;
+            return;
+        }
+        // the output format is [c1_ligand1, c1_ligand2 ... c2_ligand1...]
+
+        for (int i = 0; i<num_ang[pathway_num]; i++)
+            antagonists[pathway_num][i+num_ang[pathway_num]*cycle]=io[i];
     }
 }
