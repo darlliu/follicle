@@ -7,18 +7,24 @@ namespace fol
         cycles=cycles_in;
         cycle=0;
         num_path = 0;
-        index=rowl=coll=0;
+        index=0;
         major=1; // default to column major
-        for (int i = 0; i<2; i++)
+        /*for (int i = 0; i<2; i++)
         {
             I_n[i]=D_n[i]=ligands_n[i]=antagonists_n[i]\
                  = receptors_n[i]=active_receptors_n[i]=0;
         }// initialize to zero noise;
+        */
         states=new int [cycles];
         for (int i = 0; i<cycles; i++)
         {
             states[i]=unknown;
         }// initialize the states
+        top.resize(cycles);
+        dp.resize(cycles);
+        bulge.resize(cycles);
+        prc.resize(cycles);
+
     }
 /*  
     void follicle::cur_ligands (unsigned int pathway_num, double * io)
