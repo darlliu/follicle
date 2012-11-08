@@ -3,7 +3,7 @@ function fol1d5
 
 clc
 close all
-N=800;
+N=200;
 % discritize N pts along x
 x=linspace (0,1,N);
 dx=1/N;
@@ -12,10 +12,10 @@ dx=1/N;
 
 
 
-M=1000;
+M=5000;
 % time points
 
-dt=0.02; 
+dt=0.5; 
 %discritized time;
 
 
@@ -72,10 +72,10 @@ kon2=5;
 koff2=1;
 kdeg1=1E-3;
 kdeg2=1E-3;
-kg1=2E-5;
-kg2=1E-3;
-kgen1=kg1;
-kgen2=kg2;
+kg1=4E-4;
+kg2=5E-4;
+kgen1=2E-5;
+kgen2=2E-5;
 kr1=140;
 kr2=140;
 %rates
@@ -101,7 +101,7 @@ for i= 2: M,
     end
     H(i)=Ends(1);
     [gu2,gv2]=gen(r1,r2,kgen1,kgen2,Ends,Src,N,dt);
-    [gw2,gy2]=gen(r1,r2,kgen1,kgen2,Src,Ends,N,dt);
+    [gw2,gy2]=gen(r1,r2,kgen1*2,kgen2/2,Src,Ends,N,dt);
     [gu3,gw3]=rxn2(u,w,kr1,dt);
     [gv3,gy3]=rxn2(v,y,kr2,dt);
     
@@ -165,7 +165,9 @@ return
 
 function n=grow(r1,r2,kg1,kg2)
 %this part is tricky. must return n integer and n<N
-n=-sum(r1)^6/((kg1)^6+abs(sum(r1))^6)+sum(r2)^6/((kg2)^6+abs(sum(r2))^6);
+r1
+r2
+n=-sum(r1)^6/((kg1)^6+abs(sum(r1))^6)+sum(r2)^6/((kg2)^6+abs(sum(r2))^6)
 if (isnan(n)),
     n=0;
 end
@@ -181,8 +183,10 @@ return
 function [gu2,gv2]=gen(r1,r2,kgen1,kgen2,Ends,Src,N,dt)
 gu2=zeros(N,1);
 gv2=gu2;
-gu2(Src)=dt*(sum(r1)/(kgen1+sum(r1)));
-gv2(Ends)=dt*(sum(r2)/(kgen2+sum(r2)));
+gu2(Src)=dt*kgen1;
+gv2(Ends)=dt*kgen2;
+%gu2(Src)=dt*(sum(r1)/(kgen1+sum(r1)));
+%gv2(Ends)=dt*(sum(r2)/(kgen2+sum(r2)));
 return
 
 
