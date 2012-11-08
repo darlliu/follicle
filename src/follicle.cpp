@@ -4,17 +4,35 @@ namespace fol
 {
     follicle::follicle(unsigned int cycles_in)
     {
-        cycles=cycles_in;
+        cycles=0;
         cycle=0;
         num_path = 0;
         index=0;
         major=1; // default to column major
+
         /*for (int i = 0; i<2; i++)
         {
             I_n[i]=D_n[i]=ligands_n[i]=antagonists_n[i]\
                  = receptors_n[i]=active_receptors_n[i]=0;
         }// initialize to zero noise;
         */
+
+        init(cycles_in);
+    }
+
+    follicle::follicle ()
+    {
+        cycles=0;
+        cycle=0;
+        num_path = 0;
+        index=0;
+        major=1; // default to column major
+    }
+
+    void
+        follicle::init (unsigned int cycles_in)
+    {
+        cycles=cycles_in;
         states=new int [cycles];
         for (int i = 0; i<cycles; i++)
         {
@@ -24,8 +42,27 @@ namespace fol
         dp.resize(cycles);
         bulge.resize(cycles);
         prc.resize(cycles);
-
+        return;
     }
+
+    void
+        follicle::grow (  )
+        {
+            return ;
+        }		/* -----  end of function follicle::grow  ----- */
+
+    void
+        follicle::bind (  )
+        {
+            return ;
+        }		/* -----  end of function follicle::bind  ----- */
+
+    void
+        follicle::evolve (  )
+        {
+            return ;
+        }		/* -----  end of function follicle::evolve  ----- */
+
 /*  
     void follicle::cur_ligands (unsigned int pathway_num, double * io)
     {
@@ -87,8 +124,7 @@ namespace fol
 */
     void follicle::set_next_ligands (unsigned int pathway_num, double * io)
     {
-        if ((sizeof (io)/sizeof (double))!=num_lig[pathway_num] \
-                || pathway_num>num_path)
+        if ((sizeof (io)/sizeof (double))!=l1*l2*l3)
             throw ("access error: pathway size incorrect");
         if (ligands[pathway_num]==NULL)
             throw ("local storage array size incorrect");
@@ -106,7 +142,7 @@ namespace fol
             ligands[pathway_num][i+num_lig[pathway_num]*cycle]=io[i];
     }
 
-    void follicle::set_next_ligands (unsigned int pathway_num, double * io)
+    void follicle::set_next_antagonists (unsigned int pathway_num, double * io)
     {
         if ((sizeof (io)/sizeof (double))!=num_ang[pathway_num] \
                 || pathway_num>num_path)

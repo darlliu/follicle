@@ -10,7 +10,7 @@ namespace fol
         c_telo;
         p_ana;
         a_ana;
-    } states;
+    } state;
 
     
  
@@ -25,19 +25,19 @@ namespace fol
         public:
             /* ====================  LIFECYCLE     ======================================= */
             follicle (unsigned int cycles_in) ;/* constructor */
-                
+            follicle ();
             ~follicle();
-            
+            void init(unsigned int cycles_in) ;
             /* ====================  ACCESSORS     ======================================= */
-            states cur_state()
+            states cur_states()
             {
-                return state[cycle];
+                return states[cycle];
             };
             
-            states * all_state(){ return state; };
+            states * all_states(){ return states; };
 
-            double* get_active_receptors(unsigned int pathway_num) 
-                {return active_receptors[pathway_num];};
+            //double* get_active_receptors(unsigned int pathway_num) 
+                //{return active_receptors[pathway_num];};
 
             /* ====================  MUTATORS      ======================================= */
             void evolve (); 
@@ -69,7 +69,8 @@ namespace fol
 
         protected:
             /* ====================  DATA MEMBERS  ======================================= */
-            const unsigned int cycles; // number of cycles
+            const unsigned int cycles, index, l1,l2,l3; 
+                                       // number of cycles, follicle index and global bounds
                                        // note: does not change
             unsigned int cycle;    // current cycle
             unsigned int num_path; //total number of pathways
@@ -82,12 +83,15 @@ namespace fol
             bool major;         // whether to output data row major or column major
             unsigned int index; // index of follicle, convertible to (d1, d2, d3);
                                 // note: this shall become the element number (reordered) if meshed
-            std::vector<std::vector<grid>> top, bulge, dp, prc; 
-            states * state; // states if each cycle of this follicle
+            std::vector<std::vector<grid>> top, bulge, dp, prc;
+            // position vectors. top can always be determined by index
+            // since the follicle grid is 75 by 75, top = l1/75*index+l2/75*(index-75), l3';
+            // where l1 l2 always divisible by 75 (or sth else) and l3' is a const.
+            states * states; // states if each cycle of this follicle
             std::vector<double*> ligands, antagonists;  
-            receptors lig_r, ant_r;
-            // if more than one species per pathway then the species will be collapsed columnwise
-            // otherwise the length of each entries will be the number of cycles, the index will be pathway number
+            std::vector<receptors> lig_r, ant_r;
+            // the second receptor vector is optional
+            // for example in wnt dkk may be used with receptor as well
 
         private:
             /* ====================  DATA MEMBERS  ======================================= */
