@@ -7,7 +7,7 @@ function fol1d7
 clc
 close all
 global N M dx;
-N=100;
+N=200;
 % discritize N pts along x
 x=linspace (0,1,N);
 dx=1/N;
@@ -16,10 +16,10 @@ dx=1/N;
 
 
 
-M=3000;
+M=1000;
 % time points
 
-dt=0.005; 
+dt=0.0005; 
 %discritized time;
 
 
@@ -104,35 +104,18 @@ D=MakeLaplacian1D(N);
 H=zeros(M,1);
 
 for i= 2: M,
-    if counter==1,
-        Ends=Ends+grow(r1,r2,kg1,kg2);
-        if Ends(2)>62,
-            Prc=Ends-2;
-        else
-            Prc=[];
-        end
-        if Ends(2)>=100,
-            Ends=[99,100];
-        end
-        if Ends(1)<=50,
-            Ends=[50,51];
-        end
-        counter=100;
-    end
-    %growth phase
-    
-    [u2,v2,w2,y2,r11,r22]=rkd4(u,v,w,y,r1,r2,0,0,0,0,0,0,0,dt);
+    [u2,v2,w2,y2,r11,r22]=rkd4(u,v,w,y,r1,r2,0,dt);
     %k1
-    [u3,v3,w3,y3,r111,r222]=rkd4(u,v,w,y,...
-        r1,r2,u2/2,v2/2,w2/2,y2/2,r11/2,r22/2,dt/2,dt);
+    [u3,v3,w3,y3,r111,r222]=rkd4(u+u2/2,v+v2/2,w+w2/2,y+y2/2,...
+        r1+r11/2,r2+r22/2,dt/2,dt);
     %k2
     
-    [u4,v4,w4,y4,r1111,r2222]=rkd4(u,v,w,y ...
-    ,r1,r2,u3/2,v3/2,w3/2,y3/2,r111,r222,dt/2,dt);
+    [u4,v4,w4,y4,r1111,r2222]=rkd4(u+u3/2,v+v3/2,w+w3/2,y+y3/2 ...
+    ,r1+r111/2,r2+r222/2,dt/2,dt);
     %k3
     
-    [u5,v5,w5,y5,r11111,r22222]=rkd4(u,v,w,y, ...
-        r1,r2,u4,v4,w4,y4,r1111,r2222,dt,dt);
+    [u5,v5,w5,y5,r11111,r22222]=rkd4(u+u4,v+v4,w+w4,y+y4, ...
+        r1+r1111,r2+r2222,dt,dt);
    %k4
     
     U(:,i)=u+(1/6)*(u2+2*u3+2*u4+u5);
@@ -189,7 +172,6 @@ end
 % size(U)
 
 
-
 % size(Stem)
  movie(fig1, Movie, 100,8,windowsize);
  
@@ -204,41 +186,48 @@ return
 % r111=(r1+r111)*dt;
 % r222=(r2+r222)*dt;
 % return
-function [u2,v2,w2,y2,r11,r22]=rkd4(u,v,w,y,r1,r2,uu,vv,ww,yy,rr1,rr2,dt,dt2)
-global d D Rtot1 Rtot2 kon1 koff1 kon2 koff2 kdeg1 kdeg2...
-    kgen1 kgen2 kr1 kr2;
+function [u2,v2,w2,y2,r11,r22]=rkd4(u,v,w,y,r1,r2,dt,dt2)
+global d D Rtot1 Rtot2 kon1 koff1 kon2 koff2 kdeg1 kdeg2 kg1 kg2...
+    kgen1 kgen2 kr1 kr2 counter;
 global Src Rec Prc Ends; 
 global N dx;
     gu=rxn(u,r1,kon1,koff1,Rtot1,Rec,dt,N);
     gv=rxn(v,r2,kon2,koff2,Rtot2,Rec,dt,N);
-
+    if counter==1,
+        Ends=Ends+grow(r1,r2,kg1,kg2);
+        if Ends(2)>62,
+            Prc=Ends-2;
+        else
+            Prc=[];
+        end
+        if Ends(2)>=100,
+            Ends=[99,100];
+        end
+        if Ends(1)<=50,
+            Ends=[50,51];
+        end
+        counter=100;
+    end
 
     gu2=gen(kgen1,Src,N,dt);
     gv2=gen(kgen2,Ends,N,dt);
     gw2=gen(kgen1*0.9,Ends,N,dt);
-    
     gy2=gen(kgen2*0.2,Src,N,dt);
     if isempty(Prc),
     else
-%        gu2=gu2+gen(kgen1,Prc,N,dt);
-%        gy2=gy2+gen(kgen2*0.6,Prc,N,dt);
+        gu2=gu2+gen(kgen1,Prc,N,dt);
+        gy2=gy2+gen(kgen2*0.6,Prc,N,dt);
     end
-    gv2=0;
-    gw2=0;
-    
     [gu3,gw3]=rxn2(u,w,kr1,dt);
     [gv3,gy3]=rxn2(v,y,kr2,dt);
-    fu=-kdeg1*u*dt+gu+gu2+gu3;
-    fv=-kdeg1*v*dt+gv+gv2+gv3;
-    fw=-kdeg1*w*dt+gw2+gw3;
-    fy=-kdeg1*y*dt+gy2+gy3;
-    u2=step(d,D,u,uu,fu,dx,dt,N)*dt2;
-    v2=step(d,D,v,vv,fv,dx,dt,N)*dt2;
-    w2=step(d,D,w,ww,fw,dx,dt,N)*dt2;
-    y2=step(d,D,y,yy,fy,dx,dt,N)*dt2;
+    
+    u2=step(d,D,u,-kdeg1*u*dt+gu+gu2+gu3,dx,dt,N)*dt2;
+    v2=step(d,D,v,-kdeg1*v*dt+gv+gv2+gv3,dx,dt,N)*dt2;
+    w2=step(d,D,w,-kdeg1*w*dt+gw2+gw3,dx,dt,N)*dt2;
+    y2=step(d,D,y,-kdeg1*y*dt+gy2+gy3,dx,dt,N)*dt2;
 
-    r11=step2(u,r1,rr1,Rtot1,kon1,koff1,kdeg1,Rec,dt)*dt2;
-    r22=step2(v,r2,rr2,Rtot2,kon2,koff2,kdeg2,Rec,dt)*dt2;
+    r11=step2(u,r1,Rtot1,kon1,koff1,kdeg1,Rec,dt)*dt2;
+    r22=step2(v,r2,Rtot2,kon2,koff2,kdeg2,Rec,dt)*dt2;
 
 
 return
@@ -270,12 +259,12 @@ gu2(Src)=dt*kgen1;
 return
 
 
-function u2=step(d,D,u,uu,F,dx,dt,N)
+function u2=step(d,D,u,F,dx,dt,N)
 %I=eye(N,N);
 %R=zeros(N,1);
 u2=zeros(size(u));
 u2(1:N-1) =d*(dt/dx^2)*D*u(1:N-1)+F(1:N-1);
-u2=u+uu*dt+u2;
+u2=u+u2;
 %u =(I-d*(dt/dx^2)*D)\(u+F);
 return
 
@@ -284,8 +273,8 @@ gv3=-v.*y*kr2*dt;
 gy3=gv3;
 
 
-function r=step2(u,r,rr,rtot,kon,koff,kdeg,Rec,dt)
-r=(kon*u(Rec).*(rtot-r)-(koff+kdeg)*r)*dt+rr*dt+r;
+function r=step2(u,r,rtot,kon,koff,kdeg,Rec,dt)
+r=(kon*u(Rec).*(rtot-r)-(koff+kdeg)*r)*dt+r;
 return
 % function ru=step3(u,r,rtot,kon,koff,Rec,dt)
 % ru=u*0;
