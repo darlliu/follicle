@@ -189,7 +189,6 @@ end
 % size(U)
 
 
-
 % size(Stem)
  movie(fig1, Movie, 100,8,windowsize);
  
@@ -220,12 +219,10 @@ global N dx;
     gy2=gen(kgen2*0.2,Src,N,dt);
     if isempty(Prc),
     else
-%        gu2=gu2+gen(kgen1,Prc,N,dt);
-%        gy2=gy2+gen(kgen2*0.6,Prc,N,dt);
+        gu2=gu2+gen(kgen1,Prc,N,dt);
+        gy2=gy2+gen(kgen2*0.6,Prc,N,dt);
     end
-    gv2=0;
-    gw2=0;
-    
+    gv2=0l
     [gu3,gw3]=rxn2(u,w,kr1,dt);
     [gv3,gy3]=rxn2(v,y,kr2,dt);
     fu=-kdeg1*u*dt+gu+gu2+gu3;
