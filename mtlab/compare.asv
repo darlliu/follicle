@@ -18,8 +18,8 @@ close all
 
 x=linspace(0,1,20);
 tmax=1;
-% dt1=tmax/20;
-% t1=linspace(0,tmax,20);
+dt1=tmax/20;
+t1=linspace(0,tmax,20);
 dt2=tmax/200;
 t2=linspace(0,tmax,200);
 dt3=tmax/2000;
@@ -31,6 +31,7 @@ D=-2*eye(N,N)+diag(diag(eye(N-1,N-1)),1)+diag(diag(eye(N-1,N-1)),-1);
 D(1,N)=1;
 D(N,1)=1;
 %periodic L
+D=D;
 
 u=zeros(N,1);
 v=u;
@@ -75,7 +76,6 @@ h=pcolor(T,X,U);
 colormap(jet)
 shading interp 
 set(h,'edgecolor','none');
-caxis([0 0.14])
 xlabel('position')
 ylabel('time')
 title('Forward Euler, U');
@@ -86,7 +86,6 @@ shading interp
 xlabel('position')
 ylabel('time')
 set(h,'edgecolor','none');
-caxis([0 0.14])
 title('Forward Euler,V');
 
 subplot(3,2,3)
@@ -97,7 +96,6 @@ h=pcolor(T,X,U2);
 colormap(jet)
 shading interp 
 set(h,'edgecolor','none');
-caxis([0 0.14])
 xlabel('position')
 ylabel('time')
 title('Backward Euler, U');
@@ -108,9 +106,8 @@ shading interp
 xlabel('position')
 ylabel('time')
 set(h,'edgecolor','none');
-caxis([0 0.14])
 title('Backward Euler,V');
-
+sum(E2)
 subplot(3,2,5)
 plot(t2,sum(E2))
 title('Error, U');
@@ -144,7 +141,6 @@ h=pcolor(T,X,U);
 colormap(jet)
 shading interp 
 set(h,'edgecolor','none');
-caxis([0 0.14])
 xlabel('position')
 ylabel('time')
 title('Forward Euler, U');
@@ -155,7 +151,6 @@ shading interp
 xlabel('position')
 ylabel('time')
 set(h,'edgecolor','none');
-caxis([0 0.14])
 title('Forward Euler,V');
 
 subplot(3,2,3)
@@ -166,7 +161,6 @@ h=pcolor(T,X,U2);
 colormap(jet)
 shading interp 
 set(h,'edgecolor','none');
-caxis([0 0.14])
 xlabel('position')
 ylabel('time')
 title('Backward Euler0, U');
@@ -177,7 +171,6 @@ shading interp
 xlabel('position')
 ylabel('time')
 set(h,'edgecolor','none');
-caxis([0 0.14])
 title('Backward Euler0,V');
 
 subplot(3,2,5)
@@ -215,7 +208,6 @@ h=pcolor(T,X,U);
 colormap(jet)
 shading interp 
 set(h,'edgecolor','none');
-caxis([0 0.14])
 xlabel('position')
 ylabel('time')
 title('Forward Euler, U');
@@ -226,7 +218,6 @@ shading interp
 xlabel('position')
 ylabel('time')
 set(h,'edgecolor','none');
-caxis([0 0.14])
 title('Forward Euler,V');
 
 subplot(3,2,3)
@@ -234,7 +225,6 @@ h=pcolor(T,X,U3);
 colormap(jet)
 shading interp 
 set(h,'edgecolor','none');
-caxis([0 0.14])
 xlabel('position')
 ylabel('time')
 title('RK4, U');
@@ -245,7 +235,6 @@ shading interp
 xlabel('position')
 ylabel('time')
 set(h,'edgecolor','none');
-caxis([0 0.14])
 title('RK4,V');
 
 subplot(3,2,5)
@@ -270,7 +259,7 @@ unext=((1/dx^2)*D*u+10*u.*v)*dt+u;
 return
 
 function unext=fem2(D,u,v,dt,dx)
-unext=((1/dx^2)*D*u+10*u.*v)*dt;
+unext=((1/dx^2)*D*u+10*u.*v);
 return
 
 function unext=bwd (D,u,u0,v0,dt,dx)
@@ -283,20 +272,20 @@ unext=(I-(dt/dx^2)*D)\(u+10*u.*v*dt);
 
 function [unext,vnext]=rk4 (D,u,v,dt,dx)
 u1=fem2(D,u,v,dt,dx);
-v1=fem2(D,v,u,dt,dx);
+v1=v*dt;
 %k1
 
-u2=fem2(D,u+u1/2,v+v1/2,dt,dx);
-v2=fem2(D,v+v1/2,u+u1/2,dt,dx);
+u2=fem2(D,u+u1/2,v+v1/2,dt/2,dx);
+v2=fem2(D,v+v1/2,u+u1/2,dt/2,dx);
 
 %k2
 
-u3=fem2(D,u+u2/2,v+v2/2,dt,dx);
-v3=fem2(D,v+v2/2,u+u2/2,dt,dx);
+u3=fem2(D,u+u2/2,v+v2/2,dt/2,dx)*dt;
+v3=fem2(D,v+v2/2,u+u2/2,dt/2,dx)*dt;
 %k3
 
-u4=fem2(D,u+u3,v+v3,dt,dx);
-v4=fem2(D,v+v3,u+u3,dt,dx);
+u4=fem2(D,u+u3,v+v3,dt,dx)*dt;
+v4=fem2(D,v+v3,u+u3,dt,dx)*dt;
 
 %k4
 
