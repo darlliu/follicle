@@ -7,7 +7,7 @@ function fol1d7
 clc
 close all
 global N M dx;
-N=200;
+N=100;
 % discritize N pts along x
 x=linspace (0,1,N);
 dx=1/N;
@@ -19,7 +19,7 @@ dx=1/N;
 M=1000;
 % time points
 
-dt=0.0005; 
+dt=0.00005; 
 %discritized time;
 
 
@@ -87,7 +87,7 @@ kr1=140;
 kr2=140;
 counter=100;
 
-d=1E-3;
+d=1E3;
 %diffusion rate
 
 
