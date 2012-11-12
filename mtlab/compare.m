@@ -570,80 +570,152 @@ legend('rk4','ifab2')
 
 %----------Here compares FEM with IFAB2--------%
 
-% 
-% close all
-% 
-% %explicit higher order method
-% U2=zeros(20,1000);
-% V2=U2;
-% U2(:,1)=u;
-% V2(:,1)=v;
-% 
-% 
-% for i=2:1000,
-%     [U2(:,i),V2(:,i)]=ifrk2(D,U2(:,i-1),V2(:,i-1),dt3,dx);
-% 
-%     E2(:,i)=abs(U(:,i)-U2(:,i));
-%     EE2(:,i)=abs(V(:,i)-V2(:,i));
-% end
-% figure
-% subplot(3,2,1)
-% [X,T]=meshgrid(t3,x);
-% 
-% h=pcolor(T,X,U);
-% colormap(jet)
-% %shading interp 
-% set(h,'edgecolor','none');
-% caxis([0 0.14])
-% xlabel('position')
-% ylabel('time')
-% title('Runge Kutta, U');
-% subplot(3,2,2)
-% h=pcolor(T,X,V);
-% colormap(jet)
-% %shading interp 
-% xlabel('position')
-% ylabel('time')
-% set(h,'edgecolor','none');
-% caxis([0 0.14])
-% title('Runge Kutta,V');
-% 
-% 
-% subplot(3,2,3)
-% [X,T]=meshgrid(t1,x);
-% 
-% h=pcolor(T,X,U2);
-% colormap(jet)
-% %shading interp 
-% set(h,'edgecolor','none');
-% caxis([0 0.14])
-% xlabel('position')
-% ylabel('time')
-% title('IFRK2, U');
-% subplot(3,2,4)
-% h=pcolor(T,X,V2);
-% colormap(jet)
-% %shading interp 
-% xlabel('position')
-% ylabel('time')
-% set(h,'edgecolor','none');
-% caxis([0 0.14])
-% title('IFRK2,V');
-% 
-% subplot(3,2,5)
-% plot(t1,sum(E2))
-% title('L2 sum Error, U');
-% subplot(3,2,6)
-% plot(t1,sum(EE2))
-% title('L2 sum Error,V');
-% xlabel('time')
-% 
-% figure
-% plot(t3,U(3,:),t1,U2(3,:))
-% title('U3 plots')
-% legend('rk4','ifrk2')
-% 
-% %----------Here compares FEM with IFRK2--------%
+
+
+%explicit higher order method
+U2=zeros(20,200);
+V2=U2;
+U2(:,1)=u;
+V2(:,1)=v;
+
+
+for i=2:200,
+    [U2(:,i),V2(:,i)]=ifrk2(D,U2(:,i-1),V2(:,i-1),dt2,dx);
+
+    E2(:,i)=abs(U(:,i*10)-U2(:,i));
+    EE2(:,i)=abs(V(:,i*10)-V2(:,i));
+end
+figure
+subplot(3,2,1)
+[X,T]=meshgrid(t3,x);
+
+h=pcolor(T,X,U);
+colormap(jet)
+%shading interp 
+set(h,'edgecolor','none');
+caxis([0 0.14])
+xlabel('position')
+ylabel('time')
+title('Runge Kutta, U');
+subplot(3,2,2)
+h=pcolor(T,X,V);
+colormap(jet)
+%shading interp 
+xlabel('position')
+ylabel('time')
+set(h,'edgecolor','none');
+caxis([0 0.14])
+title('Runge Kutta,V');
+
+
+subplot(3,2,3)
+[X,T]=meshgrid(t2,x);
+
+h=pcolor(T,X,U2);
+colormap(jet)
+%shading interp 
+set(h,'edgecolor','none');
+caxis([0 0.14])
+xlabel('position')
+ylabel('time')
+title('ifrk2, U');
+subplot(3,2,4)
+h=pcolor(T,X,V2);
+colormap(jet)
+%shading interp 
+xlabel('position')
+ylabel('time')
+set(h,'edgecolor','none');
+caxis([0 0.14])
+title('ifrk2,V');
+
+subplot(3,2,5)
+plot(t2,sum(E2))
+title('L2 sum Error, U');
+subplot(3,2,6)
+plot(t2,sum(EE2))
+title('L2 sum Error,V');
+xlabel('time')
+
+figure
+plot(t3,U(3,:),t2,U2(3,:))
+title('U3 plots')
+legend('rk4','ifrk2')
+
+%------IFRK2 revised------%
+
+%explicit higher order method
+U2=zeros(20,200);
+V2=U2;
+U2(:,1)=u;
+V2(:,1)=v;
+U2(:,2)=U(:,2);
+V2(:,2)=V(:,2);
+
+for i=2:200,
+    [U2(:,i),V2(:,i)]=etd1(D,U2(:,i-1),V2(:,i-1),dt2,dx);
+
+    E2(:,i)=abs(U(:,i*10)-U2(:,i));
+    EE2(:,i)=abs(V(:,i*10)-V2(:,i));
+end
+figure
+subplot(3,2,1)
+[X,T]=meshgrid(t3,x);
+
+h=pcolor(T,X,U);
+colormap(jet)
+%shading interp 
+set(h,'edgecolor','none');
+caxis([0 0.14])
+xlabel('position')
+ylabel('time')
+title('Runge Kutta, U');
+subplot(3,2,2)
+h=pcolor(T,X,V);
+colormap(jet)
+%shading interp 
+xlabel('position')
+ylabel('time')
+set(h,'edgecolor','none');
+caxis([0 0.14])
+title('Runge Kutta,V');
+
+
+subplot(3,2,3)
+[X,T]=meshgrid(t2,x);
+
+h=pcolor(T,X,U2);
+colormap(jet)
+%shading interp 
+set(h,'edgecolor','none');
+caxis([0 0.14])
+xlabel('position')
+ylabel('time')
+title('etd1, U');
+subplot(3,2,4)
+h=pcolor(T,X,V2);
+colormap(jet)
+%shading interp 
+xlabel('position')
+ylabel('time')
+set(h,'edgecolor','none');
+caxis([0 0.14])
+title('etd1,V');
+
+subplot(3,2,5)
+plot(t2,sum(E2))
+title('L2 sum Error, U');
+subplot(3,2,6)
+plot(t2,sum(EE2))
+title('L2 sum Error,V');
+xlabel('time')
+
+figure
+plot(t3,U(3,:),t2,U2(3,:))
+title('U3 plots')
+legend('rk4','etd1')
+
+%----------Here compares FEM with IFRK2--------%
 
 
 % %close all U2=zeros(20,1000); V2=U2; U2(:,1)=u; V2(:,1)=v;
@@ -766,16 +838,50 @@ unext = (3*I-2*(dt/dx^2)*D)\(4*u-u1+4*dt*(10*u.*v)-2*dt*(10*u1.*v1));
 return
 
 function unext=ifab2(D,u,u1,v,v1,dt,dx)
-I=eye(20,20);
-Dm=expm((1/dx^2)*D);
-Dm2=expm((2/dx^2)*D);
+
+Dm=expm((dt/dx^2)*D);
+Dm2=expm((2*dt/dx^2)*D);
 unext=Dm*u+3*dt/2*Dm*(10*u.*v)-dt/2*Dm2*(10*u1.*v1);
 
 function [unext,vnext]=ifrk2(D,u,v,dt,dx)
-Dm=expm((1/dx^2)*D);
+Dm=expm((dt/dx^2)*D);
 u1=Dm*(u+dt*10*u.*v);
 v1=Dm*(v+dt*10*u.*v);
 f1=10*u1.*v1;
 unext=Dm*u+dt/2*(Dm*(10*u.*v)+f1);
 vnext=Dm*v+dt/2*(Dm*(10*u.*v)+f1);
 
+function [unext,vnext]=etd2rk(D,u,v,u1,v1,dt,dx)
+I=eye(20,20);
+%svd
+[lu,ls,lv]=svd((1/dx^2)*D);
+ls(find(ls~=0))=1./ls(find(ls~=0));
+%singular inverse of s
+L=inv(lv)*ls*inv(lu);
+Dm=expm((dt/dx^2)*D);
+M1=L*(Dm-I)+dt*Dm*(I-L*((1/dx^2)*D));
+M2=L*L*(Dm-(I+(dt/(dx^2))*D))+(1/2)*dt^2*Dm*(I-L*((1/dx^2)*D));
+ua=Dm*u+M1*(10*u.*v);
+va=Dm*v+M1*(10*u.*v);
+unext=ua+M2*(10*u.*v-10*u1.*v1)/dt;
+vnext=va+M2*(10*u.*v-10*u1.*v1)/dt;
+
+
+
+function [unext,vnext]=etd1(D,u,v,dt,dx)
+I=eye(20,20);
+%svd
+[lu,ls,lv]=svd((1/dx^2)*D);
+ls(find(ls~=0))=1./ls(find(ls~=0));
+%singular inverse of s
+L=inv(lv)*ls*inv(lu);
+Dm=expm((dt/dx^2)*D);
+M1=L*(Dm-I)+dt*Dm*(I-L*((1/dx^2)*D));
+%M2=L*L*(Dm-(I-dt*L))+(1/2)*dt^2*Dm*(I-L*((1/dx^2)*D));
+%ua=Dm*u+M1*(10*u.*v);
+%va=Dm*v+M1*(10*u.*v);
+%unext=ua+M2*(10*ua.*va-10*u.*v)/dt;
+%vnext=va+M2*(10*ua.*va-10*u.*v)/dt;
+
+unext=Dm*u+M1*(10*u.*v);
+vnext=Dm*v+M1*(10*u.*v);
