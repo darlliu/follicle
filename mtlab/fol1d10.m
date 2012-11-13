@@ -1,5 +1,5 @@
 function fol1d10
-%fol1d6 but with abbd2 method.
+%fol1d6 but with ifrk4 method.
 
 
 
@@ -15,7 +15,7 @@ dx=1/N;
 
 
 
-M=15000;
+M=5000;
 % time points
 
 dt=0.01; 
@@ -201,16 +201,23 @@ global Dm;
 
 
 [uf,wf,vf,yf,r1f,r2f]=bigf(u,w,v,y,r1,r2,dt);
+%a/Dm
+[uf2,wf2,vf2,yf2,r1f2,r2f2]=bigf(Dm*(u+uf/2),Dm*(w+wf/2),...
+    Dm*(v+vf/2),Dm*(y+yf/2),r1+r1f/2,r2+r2f/2,dt);
+%b
+[uf3,wf3,vf3,yf3,r1f3,r2f3]=bigf(Dm*(u+uf2/2),Dm*(w+wf2/2),...
+    Dm*(v+vf2/2),Dm*(y+yf2/2),r1+r1f2/2,r2+r2f2/2,dt);
+%c
+[uf4,wf4,vf4,yf4,r1f4,r2f4]=bigf(Dm*(u+uf3),Dm*(w+wf3),...
+    Dm*(v+vf3),Dm*(y+yf3),r1+r1f3,r2+r2f3,dt);
+%d
 
-[uf2,wf2,vf2,yf2,r1f2,r2f2]=bigf(Dm*(u+uf),Dm*(w+wf),...
-    Dm*(v+vf),Dm*(y+yf),r1,r2,dt);
-
-un=Dm*u+0.5*(Dm*(uf)+uf2);
-vn=Dm*v+0.5*(Dm*(vf)+vf2);
-wn=Dm*w+0.5*(Dm*(wf)+wf2);
-yn=Dm*u+0.5*(Dm*(yf)+yf2);
-r1n=r1+r1f;
-r2n=r2+r2f;
+un=Dm*u+(1/6)*(Dm*(uf)+2*uf2+2*uf3+uf4);
+vn=Dm*v+(1/6)*(Dm*(vf)+2*vf2+2*vf3+vf4);
+wn=Dm*w+(1/6)*(Dm*(wf)+2*wf2+2*wf3+wf4);
+yn=Dm*u+(1/6)*(Dm*(yf)+2*yf2+2*yf3+yf4);
+r1n=r1+(1/6)*(r1f+2*r1f2+2*r1f3+r1f4);
+r2n=r2+(1/6)*(r2f+2*r2f2+2*r2f3+r2f4);
 return
 
 function [u2,w2,v2,y2,r12,r22]=fem(u,w,v,y,r1,r2,dt)

@@ -206,8 +206,8 @@ un=Dm*u+3/2*Dm*uf-1/2*Dm2*uf2;
 wn=Dm*w+3/2*Dm*wf-1/2*Dm2*wf2;
 vn=Dm*v+3/2*Dm*vf-1/2*Dm2*vf2;
 yn=Dm*y+3/2*Dm*yf-1/2*Dm2*yf2;
-r1n=r1+r1f;
-r2n=r2+r2f;
+r1n=r1+3/2*r1f-1/2*r1f2;
+r2n=r2+3/2*r2f-1/2*r2f2;
 return
 
 function [u2,w2,v2,y2,r12,r22]=fem(u,w,v,y,r1,r2,dt)

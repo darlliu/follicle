@@ -1,5 +1,6 @@
-function fol1d8
-%fol1d6 but with crn1
+function fol1d9
+%fol1d6 but with abbd2 method.
+
 
 
 clc
@@ -14,7 +15,7 @@ dx=1/N;
 
 
 
-M=5000;
+M=15000;
 % time points
 
 dt=0.01; 
@@ -83,7 +84,7 @@ kgen1=2.1E-5;
 kgen2=2E-5;
 kr1=14;
 kr2=140;
-d=1E-1;
+d=1E-2;
 %diffusion rate
 
 counter=20;
@@ -98,7 +99,8 @@ flag=0;
 %coupling constants
 
 H=zeros(M,1);
-for i= 2: M,
+[U(:,2),W(:,2),V(:,2),Y(:,2)]= fem(u,w,v,y,r1,r2,dt);
+for i= 3: M,
 
     if counter==1,
         [n,flag]=grow(r1,r2,kg1,kg2,flag);
@@ -121,10 +123,9 @@ for i= 2: M,
     counter=counter-1;
     H(i)=Ends(1);
 
-
     
-    
-    [U(:,i),W(:,i),V(:,i),Y(:,i),R1(:,i),R2(:,i)]=crn1(u,w,v,y,r1,r2,dt);
+    [U(:,i),W(:,i),V(:,i),Y(:,i),R1(:,i),R2(:,i)]=abbd(u,w,v,y,r1,r2, ...
+    U(:,i-2),W(:,i-2),V(:,i-2),Y(:,i-2),R1(:,i-2),R2(:,i-2),dt);
     u=U(:,i);
     v=V(:,i);
     w=W(:,i);
@@ -194,23 +195,36 @@ end
 
 return
 
-function [un,wn,vn,yn,r1n,r2n]=crn1(u,w,v,y,r1,r2,dt)
+function [un,wn,vn,yn,r1n,r2n]=abbd(u,w,v,y,r1,r2,u2,w2,v2,y2,r12,r22,dt)
 global d D dx N;
 I=eye(N,N);
 [uf,wf,vf,yf,r1f,r2f]=bigf(u,w,v,y,r1,r2,dt);
-[u2,w2,v2,y2,r12,r22]=fem(u,w,v,y,r1,r2,dt);
 [uf2,wf2,vf2,yf2,r1f2,r2f2]=bigf(u2,w2,v2,y2,r12,r22,dt);
-un=(I-d*(dt/dx^2)*D)\(u+0.5*(uf+uf2+(dt/dx^2)*(d*D*u)));
-vn=(I-d*(dt/dx^2)*D)\(v+0.5*(vf+vf2+(dt/dx^2)*(d*D*v)));
-wn=(I-d*(dt/dx^2)*D)\(w+0.5*(wf+wf2+(dt/dx^2)*(d*D*w)));
-yn=(I-d*(dt/dx^2)*D)\(y+0.5*(yf+yf2+(dt/dx^2)*(d*D*y)));
+
+un=(3*I-2*(dt/dx^2)*d*D)\(4*u-u2+4*(uf)-2*uf2);
+wn=(3*I-2*(dt/dx^2)*d*D)\(4*w-w2+4*(wf)-2*wf2);
+vn=(3*I-2*(dt/dx^2)*d*D)\(4*v-v2+4*(vf)-2*vf2);
+yn=(3*I-2*(dt/dx^2)*d*D)\(4*y-y2+4*(yf)-2*yf2);
 r1n=r1+r1f;
 r2n=r2+r2f;
 return
 
+function [un,wn,vn,yn,r1n,r2n]=abbd(u,w,v,y,r1,r2,u2,w2,v2,y2,r12,r22,dt)
+global d D dx N;
+I=eye(N,N);
+[uf,wf,vf,yf,r1f,r2f]=bigf(u,w,v,y,r1,r2,dt);
+[uf2,wf2,vf2,yf2,r1f2,r2f2]=bigf(u2,w2,v2,y2,r12,r22,dt);
+
+un=(3*I-2*(dt/dx^2)*d*D)\(4*u-u2+4*(uf)-2*uf2);
+wn=(3*I-2*(dt/dx^2)*d*D)\(4*w-w2+4*(wf)-2*wf2);
+vn=(3*I-2*(dt/dx^2)*d*D)\(4*v-v2+4*(vf)-2*vf2);
+yn=(3*I-2*(dt/dx^2)*d*D)\(4*y-y2+4*(yf)-2*yf2);
+r1n=r1+r1f;
+r2n=r2+r2f;
+return
 function [u2,w2,v2,y2,r12,r22]=fem(u,w,v,y,r1,r2,dt)
 %used as an approximation
-global D d dx;
+global D dx;
 [uf,wf,vf,yf,r1f,r2f]=bigf(u,w,v,y,r1,r2,dt);
 
 u2=(dt/dx^2)*d*D*u+uf*dt+u;
