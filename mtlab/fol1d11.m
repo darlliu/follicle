@@ -15,7 +15,7 @@ dx=1/N;
 
 
 
-M=15000;
+M=5000;
 % time points
 
 dt=0.01; 
@@ -84,7 +84,7 @@ kgen1=2.1E-5;
 kgen2=2E-5;
 kr1=14;
 kr2=140;
-d=1E-2;
+d=1E-1;
 %diffusion rate
 
 counter=20;
@@ -141,14 +141,14 @@ end
 
 %plotting routines
 figure
-subplot(1,2,1)
-plot(t,sum(R1));
+% subplot(1,2,1)
+plot(t,sum(R1),t,sum(R2));
 title('receptor bound overtime')
-legend('BMP_L_R')
-subplot(1,2,2)
-plot(t,sum(R2));
-title('receptor bound overtime')
-legend('Wnt_L_R')
+legend('BMP_L_R','Wnt_L_R')
+% subplot(1,2,2)
+% plot(t,sum(R2));
+% title('receptor bound overtime')
+% legend('Wnt_L_R')
 figure
 plot(t,H);
 title('growth vs time')
