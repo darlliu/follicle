@@ -209,7 +209,7 @@ r1n=r1+r1f;
 r2n=r2+r2f;
 return
 
-function [un,wn,vn,yn,r1n,r2n]=abbd(u,w,v,y,r1,r2,u2,w2,v2,y2,r12,r22,dt)
+function [un,wn,vn,yn,r1n,r2n]=abam(u,w,v,y,r1,r2,u2,w2,v2,y2,r12,r22,dt)
 global d D dx N;
 I=eye(N,N);
 [uf,wf,vf,yf,r1f,r2f]=bigf(u,w,v,y,r1,r2,dt);
@@ -222,6 +222,7 @@ yn=(3*I-2*(dt/dx^2)*d*D)\(4*y-y2+4*(yf)-2*yf2);
 r1n=r1+r1f;
 r2n=r2+r2f;
 return
+
 function [u2,w2,v2,y2,r12,r22]=fem(u,w,v,y,r1,r2,dt)
 %used as an approximation
 global D dx;
