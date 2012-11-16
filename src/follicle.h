@@ -55,9 +55,18 @@ namespace fol
             // 3. 
 
 
-            void bind();
+            void bind()
+            {
+                touch();
+                // let receptors bind to ligands
+                write();
+                // write receptor info
+            };
             // for each receptor with binding affinity x
             // do the binding given the correct amount of gradient
+
+
+            
 
             void set_next_ligands (unsigned int pathway_num, double *in);
             void set_next_antagonists (unsigned int pathway_num, double *in);
@@ -74,12 +83,11 @@ namespace fol
                                        // note: does not change
             unsigned int cycle;    // current cycle
             unsigned int num_path; //total number of pathways
-            std::vector<unsigned int> num_lig, num_ang, num_receptor;
+            //std::vector<unsigned int> num_lig, num_ang, num_receptor;
                                // number of ligands, antagonists, receptors as indexed by pathway number
                                // these are 1 by default
                                // they are unused as of now!
-
-            int* path_type;     // pathway types, positive has greater
+            //int* path_type;     // pathway types, positive has greater
             bool major;         // whether to output data row major or column major
             unsigned int index; // index of follicle, convertible to (d1, d2, d3);
                                 // note: this shall become the element number (reordered) if meshed
@@ -87,12 +95,24 @@ namespace fol
             // position vectors. top can always be determined by index
             // since the follicle grid is 75 by 75, top = l1/75*index+l2/75*(index-75), l3';
             // where l1 l2 always divisible by 75 (or sth else) and l3' is a const.
+            
             states * states; // states if each cycle of this follicle
-            std::vector<double*> ligands, antagonists;  
+            //std::vector<double*> ligands, antagonists;  
             std::vector<receptors> lig_r, ant_r;
             // the second receptor vector is optional
             // for example in wnt dkk may be used with receptor as well
+            
 
+            pathway** pathway;
+            // handles to pathways
+            //
+            //
+            // the algorithm for follicle should be this:
+            // 1. loop through pathways and touch() to generate R vector
+            // 1.5 repeat 1 and get next round ligands/antagonists
+            // 2. when next round of pathway ligands and antagonists are determined 
+            //    bind() to determine receptors bound
+            // 3. rinse and repeat
         private:
             /* ====================  DATA MEMBERS  ======================================= */
 
