@@ -1,5 +1,5 @@
-function U=fol1d11(M,N,dt)
-%fol1d6 but with ifab2 method.
+function U=fol1d12(M,N,dt)
+%fol1d6 but with edrk2 method.
 
 
 global dx;
@@ -14,6 +14,7 @@ dx=1/N;
 
 
 % time points
+
 
 %discritized time;
 
@@ -62,7 +63,7 @@ t=0:dt:dt*(M-1);
 %time vector
 
 %parameters:
-global d D Dm Dm2 Rtot1 Rtot2 kon1 koff1 kon2 koff2 kdeg1 kdeg2 kg1 kg2...
+global L d D Dm Dm2 M1 M2 Rtot1 Rtot2 kon1 koff1 kon2 koff2 kdeg1 kdeg2 kg1 kg2...
     kgen1 kgen2 kr1 kr2 counter;
 
 Rtot1=1E-3;
@@ -87,6 +88,13 @@ counter=20;
 D=MakeLaplacian1D(N);
 Dm=expm((d*dt/dx^2)*D);
 Dm2=expm((2*d*dt/dx^2)*D);
+[lu,ls,lv]=svd((1/dx^2)*D);
+ls(find(ls~=0))=1./ls(find(ls~=0));
+%singular inverse of s
+L=inv(lv)*ls*inv(lu);
+I=eye(N,N);
+M1=L*((Dm-I))+dt*Dm*(I-L*(1/dx^2*D));
+M2=L^2*(Dm-(I+dt/dx^2*D))+1/2*dt^2*Dm*(I-L*(1/dx^2)*D);
 % diffusion matrix
 flag=0;
 %rates
@@ -121,9 +129,9 @@ for i= 3: M,
     counter=counter-1;
     H(i)=Ends(1);
 
-    
-    [U(:,i),W(:,i),V(:,i),Y(:,i),R1(:,i),R2(:,i)]=ifab2(u,w,v,y,r1,r2, ...
-    U(:,i-2),W(:,i-2),V(:,i-2),Y(:,i-2),R1(:,i-2),R2(:,i-2),dt);
+    [U(:,i),W(:,i),V(:,i),Y(:,i),R1(:,i),R2(:,i)]=etdrk2(u,w,v,y,r1,r2,dt);
+    %[U(:,i),W(:,i),V(:,i),Y(:,i),R1(:,i),R2(:,i)]=ifab2(u,w,v,y,r1,r2, ...
+    %U(:,i-2),W(:,i-2),V(:,i-2),Y(:,i-2),R1(:,i-2),R2(:,i-2),dt);
     u=U(:,i);
     v=V(:,i);
     w=W(:,i);
@@ -174,7 +182,7 @@ end
 % 
 % % size(Stem)
 %  movie(fig1, Movie, 100,8,windowsize);
-%  
+ 
 return
 
 function [n,flag]=grow(r1,r2,kg1,kg2,flag)
@@ -204,6 +212,23 @@ vn=Dm*v+3/2*Dm*vf-1/2*Dm2*vf2;
 yn=Dm*y+3/2*Dm*yf-1/2*Dm2*yf2;
 r1n=r1+3/2*r1f-1/2*r1f2;
 r2n=r2+3/2*r2f-1/2*r2f2;
+return
+
+function [un,wn,vn,yn,r1n,r2n]=etdrk2(u,w,v,y,r1,r2,dt)
+global Dm M1 M2;
+[uf,wf,vf,yf,r1f,r2f]=bigf(u,w,v,y,r1,r2,1);
+%calculate big Fn with no time coeff
+ua=Dm*u+M1*uf;
+va=Dm*v+M1*vf;
+wa=Dm*w+M1*wf;
+ya=Dm*y+M1*yf;
+[uf2,wf2,vf2,yf2,r1f2,r2f2]=bigf(ua,va,wa,ya,r1,r2,1);
+un=ua+M2*(uf2-uf)/dt;
+vn=va+M2*(vf2-vf)/dt;
+wn=va+M2*(wf2-wf)/dt;
+yn=va+M2*(yf2-yf)/dt;
+r1n=r1+dt*r1f;
+r2n=r2+dt*r2f;
 return
 
 function [u2,w2,v2,y2,r12,r22]=fem(u,w,v,y,r1,r2,dt)

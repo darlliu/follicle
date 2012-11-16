@@ -1,12 +1,10 @@
-function fol1d9
+function U=fol1d9(M,N,dt)
 %fol1d6 but with abbd2 method.
 
 
 
-clc
-close all
-global N M dx;
-N=200;
+global dx;
+
 % discritize N pts along x
 x=linspace (0,1,N);
 dx=1/N;
@@ -15,10 +13,10 @@ dx=1/N;
 
 
 
-M=15000;
+
 % time points
 
-dt=0.01; 
+
 %discritized time;
 
 
@@ -84,7 +82,7 @@ kgen1=2.1E-5;
 kgen2=2E-5;
 kr1=14;
 kr2=140;
-d=1E-2;
+d=1E-1;
 %diffusion rate
 
 counter=20;
@@ -134,48 +132,48 @@ for i= 3: M,
     r2=R2(:,i);
 
 end
-
-
-
-%plotting routines
-figure
-subplot(1,2,1)
-plot(t,sum(R1));
-title('receptor bound overtime')
-legend('BMP_L_R')
-subplot(1,2,2)
-plot(t,sum(R2));
-title('receptor bound overtime')
-legend('Wnt_L_R')
-figure
-plot(t,H);
-title('growth vs time')
-fig1=figure;
-plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i))
-legend('BMP','wnt','Noggin','Dkk')
-windowsize=get(fig1,'Position');
-windowsize(1:2)=[0,0];
-Movie=moviein(100,fig1,windowsize);
-Movie(:,1)=getframe(fig1,windowsize);
-frame=2;
-
-for i=101:M/100:M,
-
-    plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i))
-    legend('BMP','wnt','Noggin','Dkk')
-    %plot(x,U(:,i))
-    Movie(:,frame)=getframe(fig1,windowsize);
-    frame=frame+1;
-
-end
-
-% size(Results)
-
-% size(U)
-
-
-% size(Stem)
- movie(fig1, Movie, 100,8,windowsize);
+% 
+% 
+% 
+% %plotting routines
+% figure
+% subplot(1,2,1)
+% plot(t,sum(R1));
+% title('receptor bound overtime')
+% legend('BMP_L_R')
+% subplot(1,2,2)
+% plot(t,sum(R2));
+% title('receptor bound overtime')
+% legend('Wnt_L_R')
+% figure
+% plot(t,H);
+% title('growth vs time')
+% fig1=figure;
+% plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i))
+% legend('BMP','wnt','Noggin','Dkk')
+% windowsize=get(fig1,'Position');
+% windowsize(1:2)=[0,0];
+% Movie=moviein(100,fig1,windowsize);
+% Movie(:,1)=getframe(fig1,windowsize);
+% frame=2;
+% 
+% for i=101:M/100:M,
+% 
+%     plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i))
+%     legend('BMP','wnt','Noggin','Dkk')
+%     %plot(x,U(:,i))
+%     Movie(:,frame)=getframe(fig1,windowsize);
+%     frame=frame+1;
+% 
+% end
+% 
+% % size(Results)
+% 
+% % size(U)
+% 
+% 
+% % size(Stem)
+%  movie(fig1, Movie, 100,8,windowsize);
  
 return
 
@@ -205,13 +203,13 @@ un=(3*I-2*(dt/dx^2)*d*D)\(4*u-u2+4*(uf)-2*uf2);
 wn=(3*I-2*(dt/dx^2)*d*D)\(4*w-w2+4*(wf)-2*wf2);
 vn=(3*I-2*(dt/dx^2)*d*D)\(4*v-v2+4*(vf)-2*vf2);
 yn=(3*I-2*(dt/dx^2)*d*D)\(4*y-y2+4*(yf)-2*yf2);
-r1n=r1+r1f;
-r2n=r2+r2f;
+r1n=r1+(3/2*r1f-1/2*r1f2);
+r2n=r2+(3/2*r2f-1/2*r2f2);
 return
 
 function [u2,w2,v2,y2,r12,r22]=fem(u,w,v,y,r1,r2,dt)
 %used as an approximation
-global D dx;
+global D d dx;
 [uf,wf,vf,yf,r1f,r2f]=bigf(u,w,v,y,r1,r2,dt);
 
 u2=(dt/dx^2)*d*D*u+uf*dt+u;

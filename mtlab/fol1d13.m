@@ -1,5 +1,5 @@
-function U=fol1d11(M,N,dt)
-%fol1d6 but with ifab2 method.
+function U=fol1d13(M,N,dt)
+%fol1d6 but with ab4bd4 method.
 
 
 global dx;
@@ -14,6 +14,7 @@ dx=1/N;
 
 
 % time points
+
 
 %discritized time;
 
@@ -62,7 +63,7 @@ t=0:dt:dt*(M-1);
 %time vector
 
 %parameters:
-global d D Dm Dm2 Rtot1 Rtot2 kon1 koff1 kon2 koff2 kdeg1 kdeg2 kg1 kg2...
+global d D Rtot1 Rtot2 kon1 koff1 kon2 koff2 kdeg1 kdeg2 kg1 kg2...
     kgen1 kgen2 kr1 kr2 counter;
 
 Rtot1=1E-3;
@@ -85,8 +86,6 @@ d=1E-1;
 
 counter=20;
 D=MakeLaplacian1D(N);
-Dm=expm((d*dt/dx^2)*D);
-Dm2=expm((2*d*dt/dx^2)*D);
 % diffusion matrix
 flag=0;
 %rates
@@ -98,7 +97,7 @@ flag=0;
 
 H=zeros(M,1);
 [U(:,2),W(:,2),V(:,2),Y(:,2)]= fem(u,w,v,y,r1,r2,dt);
-for i= 3: M,
+for i= 3: 5,
 
     if counter==1,
         [n,flag]=grow(r1,r2,kg1,kg2,flag);
@@ -122,7 +121,7 @@ for i= 3: M,
     H(i)=Ends(1);
 
     
-    [U(:,i),W(:,i),V(:,i),Y(:,i),R1(:,i),R2(:,i)]=ifab2(u,w,v,y,r1,r2, ...
+    [U(:,i),W(:,i),V(:,i),Y(:,i),R1(:,i),R2(:,i)]=abbd(u,w,v,y,r1,r2, ...
     U(:,i-2),W(:,i-2),V(:,i-2),Y(:,i-2),R1(:,i-2),R2(:,i-2),dt);
     u=U(:,i);
     v=V(:,i);
@@ -133,18 +132,55 @@ for i= 3: M,
 
 end
 
-% 
+
+for i= 6: M,
+
+    if counter==1,
+        [n,flag]=grow(r1,r2,kg1,kg2,flag);
+        Ends=Ends+n;
+        if Ends(2)>65,
+            Prc=Ends-2;
+        else
+            Prc=[];
+        end
+        if Ends(2)>=90,
+            Ends=[89,90];
+            flag=2;
+        end
+        if Ends(1)<=50,
+            Ends=[50,51];
+            flag=0;
+        end
+        counter=20;
+    end
+    counter=counter-1;
+    H(i)=Ends(1);
+
+    
+    [U(:,i),W(:,i),V(:,i),Y(:,i),R1(:,i),R2(:,i)]=abbd4(u,w,v,y,r1,r2, ...
+    U(:,i-2),W(:,i-2),V(:,i-2),Y(:,i-2),R1(:,i-2),R2(:,i-2), ...
+    U(:,i-3),W(:,i-3),V(:,i-3),Y(:,i-3),R1(:,i-3),R2(:,i-3), ...
+    U(:,i-4),W(:,i-4),V(:,i-4),Y(:,i-4),R1(:,i-4),R2(:,i-4), ...
+    dt);
+    u=U(:,i);
+    v=V(:,i);
+    w=W(:,i);
+    y=Y(:,i);
+    r1=R1(:,i);
+    r2=R2(:,i);
+
+end
 % 
 % %plotting routines
 % figure
-% % subplot(1,2,1)
-% plot(t,sum(R1),t,sum(R2));
+% subplot(1,2,1)
+% plot(t,sum(R1));
 % title('receptor bound overtime')
-% legend('BMP_L_R','Wnt_L_R')
-% % subplot(1,2,2)
-% % plot(t,sum(R2));
-% % title('receptor bound overtime')
-% % legend('Wnt_L_R')
+% legend('BMP_L_R')
+% subplot(1,2,2)
+% plot(t,sum(R2));
+% title('receptor bound overtime')
+% legend('Wnt_L_R')
 % figure
 % plot(t,H);
 % title('growth vs time')
@@ -174,7 +210,7 @@ end
 % 
 % % size(Stem)
 %  movie(fig1, Movie, 100,8,windowsize);
-%  
+ 
 return
 
 function [n,flag]=grow(r1,r2,kg1,kg2,flag)
@@ -193,18 +229,39 @@ end
 
 return
 
-function [un,wn,vn,yn,r1n,r2n]=ifab2(u,w,v,y,r1,r2,u2,w2,v2,y2,r12,r22,dt)
-global Dm Dm2;
+function [un,wn,vn,yn,r1n,r2n]=abbd(u,w,v,y,r1,r2,u2,w2,v2,y2,r12,r22,dt)
+global d D dx N;
+I=eye(N,N);
 [uf,wf,vf,yf,r1f,r2f]=bigf(u,w,v,y,r1,r2,dt);
 [uf2,wf2,vf2,yf2,r1f2,r2f2]=bigf(u2,w2,v2,y2,r12,r22,dt);
 
-un=Dm*u+3/2*Dm*uf-1/2*Dm2*uf2;
-wn=Dm*w+3/2*Dm*wf-1/2*Dm2*wf2;
-vn=Dm*v+3/2*Dm*vf-1/2*Dm2*vf2;
-yn=Dm*y+3/2*Dm*yf-1/2*Dm2*yf2;
-r1n=r1+3/2*r1f-1/2*r1f2;
-r2n=r2+3/2*r2f-1/2*r2f2;
+un=(3*I-2*(dt/dx^2)*d*D)\(4*u-u2+4*(uf)-2*uf2);
+wn=(3*I-2*(dt/dx^2)*d*D)\(4*w-w2+4*(wf)-2*wf2);
+vn=(3*I-2*(dt/dx^2)*d*D)\(4*v-v2+4*(vf)-2*vf2);
+yn=(3*I-2*(dt/dx^2)*d*D)\(4*y-y2+4*(yf)-2*yf2);
+r1n=r1+(3/2*r1f-1/2*r1f2);
+r2n=r2+(3/2*r2f-1/2*r2f2);
 return
+
+function [un,wn,vn,yn,r1n,r2n]=abbd4(u,w,v,y,r1,r2, ...
+    u2,w2,v2,y2,r12,r22, ...
+    u3,w3,v3,y3,r13,r23, ...
+    u4,w4,v4,y4,r14,r24, dt)
+global d D dx N;
+I=eye(N,N);
+[uf,wf,vf,yf,r1f,r2f]=bigf(u,w,v,y,r1,r2,dt);
+[uf2,wf2,vf2,yf2,r1f2,r2f2]=bigf(u2,w2,v2,y2,r12,r22,dt);
+[uf3,wf3,vf3,yf3,r1f3,r2f3]=bigf(u3,w3,v3,y3,r13,r23,dt);
+[uf4,wf4,vf4,yf4,r1f4,r2f4]=bigf(u4,w4,v4,y4,r14,r24,dt);
+
+un=(25*I-12*(dt/dx^2)*d*D)\(48*u-36*u2+16*u3-3*u4+48*(uf)-72*uf2+48*uf3-12*uf4);
+wn=(25*I-12*(dt/dx^2)*d*D)\(48*w-36*w2+16*w3-3*w4+48*(wf)-72*wf2+48*wf3-12*wf4);
+vn=(25*I-12*(dt/dx^2)*d*D)\(48*v-36*v2+16*v3-3*v4+48*(vf)-72*vf2+48*vf3-12*vf4);
+yn=(25*I-12*(dt/dx^2)*d*D)\(48*y-36*y2+16*y3-3*y4+48*(yf)-72*yf2+48*yf3-12*yf4);
+r1n=r1+(55/24*r1f-59/24*r1f2+37/24*r1f3-3/8*r1f4);
+r2n=r2+(55/24*r2f-59/24*r2f2+37/24*r2f3-3/8*r2f4);
+return
+
 
 function [u2,w2,v2,y2,r12,r22]=fem(u,w,v,y,r1,r2,dt)
 %used as an approximation
