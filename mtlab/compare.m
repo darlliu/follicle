@@ -30,6 +30,7 @@ dx=1/20;
 D=-2*eye(N,N)+diag(diag(eye(N-1,N-1)),1)+diag(diag(eye(N-1,N-1)),-1);
 D(1,N)=1;
 D(N,1)=1;
+D=5E-1*D;
 %periodic L
 
 u=zeros(N,1);
@@ -119,6 +120,9 @@ plot(t3,U(3,:),t3,U3(3,:))
 title('U3 plots')
 legend('fwd','Rk4')
 
+
+figure
+surf(T,X,U3)
 %----------Here compares FEM with RK4--------%
 
 U=U3;
