@@ -133,48 +133,48 @@ for i= 3: M,
 
 end
 
-% 
-% 
-% %plotting routines
-% figure
-% % subplot(1,2,1)
-% plot(t,sum(R1),t,sum(R2));
+
+
+%plotting routines
+figure
+% subplot(1,2,1)
+plot(t,sum(R1),t,sum(R2));
+title('receptor bound overtime')
+legend('BMP_L_R','Wnt_L_R')
+% subplot(1,2,2)
+% plot(t,sum(R2));
 % title('receptor bound overtime')
-% legend('BMP_L_R','Wnt_L_R')
-% % subplot(1,2,2)
-% % plot(t,sum(R2));
-% % title('receptor bound overtime')
-% % legend('Wnt_L_R')
-% figure
-% plot(t,H);
-% title('growth vs time')
-% fig1=figure;
-% plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i))
-% legend('BMP','wnt','Noggin','Dkk')
-% windowsize=get(fig1,'Position');
-% windowsize(1:2)=[0,0];
-% Movie=moviein(100,fig1,windowsize);
-% Movie(:,1)=getframe(fig1,windowsize);
-% frame=2;
-% 
-% for i=101:M/100:M,
-% 
-%     plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i))
-%     legend('BMP','wnt','Noggin','Dkk')
-%     %plot(x,U(:,i))
-%     Movie(:,frame)=getframe(fig1,windowsize);
-%     frame=frame+1;
-% 
-% end
-% 
-% % size(Results)
-% 
-% % size(U)
-% 
-% 
-% % size(Stem)
-%  movie(fig1, Movie, 100,8,windowsize);
-%  
+% legend('Wnt_L_R')
+figure
+plot(t,H);
+title('growth vs time')
+fig1=figure;
+plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i))
+legend('BMP','wnt','Noggin','Dkk')
+windowsize=get(fig1,'Position');
+windowsize(1:2)=[0,0];
+Movie=moviein(100,fig1,windowsize);
+Movie(:,1)=getframe(fig1,windowsize);
+frame=2;
+
+for i=101:M/100:M,
+
+    plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i))
+    legend('BMP','wnt','Noggin','Dkk')
+    %plot(x,U(:,i))
+    Movie(:,frame)=getframe(fig1,windowsize);
+    frame=frame+1;
+
+end
+
+% size(Results)
+
+% size(U)
+
+
+% size(Stem)
+ movie(fig1, Movie, 100,8,windowsize);
+ 
 return
 
 function [n,flag]=grow(r1,r2,kg1,kg2,flag)
