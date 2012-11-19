@@ -1,7 +1,8 @@
 function compare2
 clc
 close all
-N=200;
+global N M
+N=300;
 M=2000;
 dt=0.01;
 x=linspace (0,1,N);

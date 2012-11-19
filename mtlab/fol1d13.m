@@ -94,7 +94,6 @@ flag=0;
 % b1=1;
 % b2=1;
 %coupling constants
-
 H=zeros(M,1);
 [U(:,2),W(:,2),V(:,2),Y(:,2)]= fem(u,w,v,y,r1,r2,dt);
 for i= 3: 5,
@@ -282,7 +281,6 @@ global d D Rtot1 Rtot2 kon1 koff1 kon2 koff2 kdeg1 kdeg2 kg1 kg2...
     kgen1 kgen2 kr1 kr2 counter;
 global Src Rec Prc Ends; 
 global N dx;
-
 gu=rxn(u,r1,kon1,koff1,Rtot1,Rec,N);
 gv=rxn(v,r2,kon2,koff2,Rtot2,Rec,N);
 gu2=gen(kgen1*0.2,Src,N);
