@@ -2,10 +2,11 @@ function fol1d15
 %fol1d6 but with ifab2 method.
 
 
-global M N dt dx;
+global M N steps dt dx;
 N=200;
-M=16000;
+M=6000;
 dt=0.01;
+steps=50;
 % discritize N pts along x
 x=linspace (0,1,N);
 dx=1/N;
@@ -84,7 +85,7 @@ kr2=140;
 d=1E-1;
 %diffusion rate
 
-counter=50;
+counter=steps;
 D=MakeLaplacian1D(N);
 Dm=expm((d*dt/dx^2)*D);
 Dm2=expm((2*d*dt/dx^2)*D);
@@ -98,6 +99,8 @@ flag=0;
 %coupling constants
 
 H=zeros(M,1);
+H(1)=50;
+H(2)=50;
 [U(:,2),W(:,2),V(:,2),Y(:,2)]= fem(u,w,v,y,r1,r2,dt);
 for i= 3: M,
 
@@ -117,11 +120,11 @@ for i= 3: M,
             Ends=[50,51];
             flag=0;
         end
-        counter=50;
+        counter=steps;
     end
     counter=counter-1;
     H(i)=Ends(1);
-
+    
     
     [U(:,i),W(:,i),V(:,i),Y(:,i),R1(:,i),R2(:,i)]=ifab2(u,w,v,y,r1,r2, ...
     U(:,i-2),W(:,i-2),V(:,i-2),Y(:,i-2),R1(:,i-2),R2(:,i-2),dt);
@@ -139,19 +142,27 @@ end
 %plotting routines
 figure
 % subplot(1,2,1)
-plot(t,sum(R1),t,sum(R2));
+H2=H*max(max(R1))/50;
+plot(t,sum(R1),t,sum(R2),t,H2);
+
 title('receptor bound overtime')
-legend('BMP_L_R','Wnt_L_R')
+legend('BMP_L_R','Wnt_L_R','Growth')
+figure
+plot(H,sum(R1),H,sum(R2))
+legend('Wnt null','BMP null')
+title('phase portrait')
 % subplot(1,2,2)
 % plot(t,sum(R2));
 % title('receptor bound overtime')
 % legend('Wnt_L_R')
-figure
-plot(t,H);
-title('growth vs time')
+% figure
+% plot(t,H);
+% title('growth vs time')
 fig1=figure;
-plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i),x(Rec),R1(:,i)*100,'*',...
-    x(Rec),R2(:,i)*100,'o',linspace(x(30),x(H(i)),10),linspace(0, U(H(i),i),10),'^k')
+i=1;
+H(i)
+plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i),x(Rec),R1(:,i)*400,'*',...
+    x(Rec),R2(:,i)*400,'o',linspace(x(30),x(H(i)),10),linspace(0, U(H(i),i),10),'^k')
 
 legend('BMP','wnt','Noggin','Dkk','BMP_L_R','WNT_L_R','Growth')
 xlabel('Distance')
@@ -162,7 +173,7 @@ Movie=moviein(100,fig1,windowsize);
 Movie(:,1)=getframe(fig1,windowsize);
 frame=2;
 
-for i=101:M/100:M,
+for i=steps+1:M/steps:M,
 
     plot(x,U(:,i),x,V(:,i),x,W(:,i),x,Y(:,i),x(Rec),R1(:,i)*100,'*',...
         x(Rec),R2(:,i)*100,'o',linspace(x(30),x(H(i)),10),linspace(0, U(H(i),i),10),'^k')

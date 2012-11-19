@@ -87,7 +87,7 @@ kgen1=2.1E-5;
 kgen2=2E-5;
 kr1=14;
 kr2=140;
-d=1E-1;
+d=2E-1;
 %diffusion rate
 
 counter=100;
