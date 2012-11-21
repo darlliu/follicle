@@ -15,6 +15,7 @@ v=real(reshape(V(:,1), N,M)');
 %right shift
 subplot(1,2,1)
 surf(X,Y,u,'FaceColor','interp','FaceLighting','phong','EdgeColor','None');
+caxis([0 5E-4])
 view(90,90)
 title(t1)
 xlabel('X')
@@ -24,6 +25,7 @@ ylabel('Y')
 colorbar
 subplot(1,2,2)
 surf(X,Y,v,'FaceColor','interp','FaceLighting','phong','EdgeColor','None');
+caxis([0 5E-4])
 view(90,90)
 title(t2)
 xlabel('X')
@@ -44,6 +46,7 @@ for i=101:Is/100:Is,
     
     subplot(1,2,1)
     surf(X,Y,u,'FaceColor','interp','FaceLighting','phong','EdgeColor','None');
+    caxis([0 5E-4])
     view(90,90)
     xlabel('X')
     ylabel('Y')
@@ -53,6 +56,7 @@ for i=101:Is/100:Is,
     colorbar
     subplot(1,2,2)
     surf(X,Y,v,'FaceColor','interp','FaceLighting','phong','EdgeColor','None');
+    caxis([0 5E-4])
     view(90,90)
     colorbar
     xlabel('X')
