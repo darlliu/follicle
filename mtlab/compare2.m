@@ -3,7 +3,7 @@ clc
 close all
 global N M
 N=300;
-M=2000;
+M=1000;
 dt=0.01;
 x=linspace (0,1,N);
 t=0:dt:dt*(M-1);
