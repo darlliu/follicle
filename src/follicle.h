@@ -10,6 +10,7 @@ namespace fol
         c_telo;
         p_ana;
         a_ana;
+        cata;
     } state;
 
     
@@ -42,35 +43,40 @@ namespace fol
             /* ====================  MUTATORS      ======================================= */
             void evolve (); 
             // do the following:
-            // 0, make sure new ligand/antagonists info are loaded.
+            // 0, make sure new ligand/antagonists info are loaded from receptors and at current cycle.
             // 1, set the new state depending on our thresholds
-            // 2, prepare the generation vector G.
-            // 3, calculate the recepor-binding event, receptor decay event, get the R vector
-            // 4, combine into F vector and prepare for output
+            // algo: touch multiple times
+            // bind -> write
+            // evolve, grow
             
             void grow();
             // do the following:
             // 1. depending on the current state, grow once or not
             // 2. set new growth states, inform receptors.
-            // 3. 
 
-
-            void bind()
+            void set_path (unsigned int pathway_num)
             {
-                touch();
-                // let receptors bind to ligands
-                write();
-                // write receptor info
+                if (pathway_num>num_path) throw ("Critical error: pathway_num wrong!");
+                paths=pathways[pathway_num];  
             };
+            void bind(unsigned int pathway_num);
             // for each receptor with binding affinity x
             // do the binding given the correct amount of gradient
-
-
             
+            void write(unsigned int pathway_num);
 
-            void set_next_ligands (unsigned int pathway_num, double *in);
-            void set_next_antagonists (unsigned int pathway_num, double *in);
-            
+            void touch(unsigned int pathway_num);
+
+            void set_next_ligands ( double *in)
+            {
+                lig=in;
+            };
+            void set_next_antagonists (double *in)
+            {
+                ant=in;
+
+            };
+            // set next data arrays
             void generate_noise (double *mean_n, double *var_n, pathway_num);
             // given the guassian mean and variance of noise,
             // and the pathway number
@@ -78,10 +84,10 @@ namespace fol
 
         protected:
             /* ====================  DATA MEMBERS  ======================================= */
-            const unsigned int cycles, index, l1,l2,l3; 
+            const unsigned int cycles, index, l1,l2,l3, t_factor;
                                        // number of cycles, follicle index and global bounds
                                        // note: does not change
-            unsigned int cycle;    // current cycle
+            unsigned int cycle, cnt, t;    // current cycle
             unsigned int num_path; //total number of pathways
             //std::vector<unsigned int> num_lig, num_ang, num_receptor;
                                // number of ligands, antagonists, receptors as indexed by pathway number
@@ -91,21 +97,22 @@ namespace fol
             bool major;         // whether to output data row major or column major
             unsigned int index; // index of follicle, convertible to (d1, d2, d3);
                                 // note: this shall become the element number (reordered) if meshed
-            std::vector<std::vector<grid>> top, bulge, dp, prc;
+            std::vector<grid> top, bulge, dp, prc;
             // position vectors. top can always be determined by index
             // since the follicle grid is 75 by 75, top = l1/75*index+l2/75*(index-75), l3';
             // where l1 l2 always divisible by 75 (or sth else) and l3' is a const.
             
-            states * states; // states if each cycle of this follicle
+            std::vector<state> states; // states if each cycle of this follicle
             //std::vector<double*> ligands, antagonists;  
             std::vector<receptors> lig_r, ant_r;
             // the second receptor vector is optional
             // for example in wnt dkk may be used with receptor as well
-            
 
-            pathway** pathway;
+            pathway paths;
+            pathway *pathways;
             // handles to pathways
-            //
+            double *lig, *ant;
+            // collapsed data array -- big F vector
             //
             // the algorithm for follicle should be this:
             // 1. loop through pathways and touch() to generate R vector

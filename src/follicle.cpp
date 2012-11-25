@@ -5,35 +5,35 @@ namespace fol
     follicle::follicle(unsigned int cycles_in)
     {
         cycles=0;
+        t_factor=20;
+        cnt=0;
+        t=0;
         cycle=0;
         num_path = 0;
         index=0;
         major=1; // default to column major
-
-        /*for (int i = 0; i<2; i++)
-        {
-            I_n[i]=D_n[i]=ligands_n[i]=antagonists_n[i]\
-                 = receptors_n[i]=active_receptors_n[i]=0;
-        }// initialize to zero noise;
-        */
-
+        paths=NULL;
         init(cycles_in);
     }
 
     follicle::follicle ()
     {
         cycles=0;
+        t_factor=20;
+        cnt=0;
+        t=0;
         cycle=0;
         num_path = 0;
         index=0;
         major=1; // default to column major
+        paths=NULL;
     }
 
     void
         follicle::init (unsigned int cycles_in)
     {
         cycles=cycles_in;
-        states=new int [cycles];
+        states.resize(cycles);
         for (int i = 0; i<cycles; i++)
         {
             states[i]=unknown;
@@ -48,118 +48,204 @@ namespace fol
     void
         follicle::grow (  )
         {
+            switch (states[cycle])
+            {
+                case unknown:
+                    throw("Currrent cycle not initialized, try evolve?");
+                    return;
+                case r_telo:
+                    return;
+                case c_telo:
+                    return;
+                case p_ana:
+                    {
+                        for (unsigned int i = 0; i < dp.size(); i++) 
+                        {
+                            dp[i]++;
+                        }
+                        return;
+                    }
+                case a_ana:
+                    return;
+                case cata:
+                    {
+                        for (unsigned int i = 0; i < dp.size(); i++) 
+                        {
+                            dp[i]--;
+                        }
+                        return;
+                    }
+                case default:
+                    return;
+            }
+            // what more to do:
+            // inform receptors if they are on the growing parts
+            // now there's no need to do so
             return ;
         }		/* -----  end of function follicle::grow  ----- */
 
-    void
-        follicle::bind (  )
-        {
-            return ;
-        }		/* -----  end of function follicle::bind  ----- */
 
     void
         follicle::evolve (  )
         {
+            cycle++;
+            switch (states[cycle])
+            {
+                case unknown:
+                    states[cycle]=r_telo;
+                    break;
+                case r_telo:
+                    {
+                        for (unsigned int i = 0; i < num_path; i++) 
+                        {
+                            if (!paths[i].lig_thr(lig_r[i][cycle]))
+                            {
+                                states[cycle]=r_telo;
+                                break;
+                            }
+                        }
+                        states[cycle]=c_telo;
+                        break;
+                    }
+                case c_telo:
+                    {
+                        for (unsigned int i = 0; i < num_path; i++) 
+                        {
+                            if (!paths[i].lig_thc(lig_r[i][cycle]))
+                            {
+                                states[cycle]=c_telo;
+                                break;
+                            }
+                        }
+                        states[cycle]=p_ana;
+                    }
+                case p_ana:
+                    {
+                        if (dp[0].getz()-top[0].getz()>40)
+                            states[cycle]=a_ana;
+                        else
+                            states[cycle]=p_ana;
+                        break;
+                    }
+                case a_ana:
+                    {
+                        if (cnt>40)
+                        {
+                            cnt=0;
+                            states[cycle]=cata;
+                        }
+                        else
+                            states[cycle]=a_ana;
+                    }
+                case cata:
+                    {
+                        //here we assume originally dp is 10 z distance from
+                        //the top --> will reset once done one cycle 
+                        if (dp[0].getz()-top[0].getz()<=10) {
+                            states[cycle]=r_telo;
+                        }
+                        else
+                            states[cycle]=cata;
+                    }
+                case default:
+                    break;
+            }
+            if(t>t_factor)
+            {
+                cnt++;
+                grow();
+                t=0;
+            }
             return ;
         }		/* -----  end of function follicle::evolve  ----- */
 
-/*  
-    void follicle::cur_ligands (unsigned int pathway_num, double * io)
-    {
-        if ((sizeof (io)/sizeof (double))!=num_lig[pathway_num] \
-                || pathway_num>num_path)
-            throw ("access error: pathway size incorrect");
-        if (ligands[pathway_num]==NULL)
-            throw ("local storage array size incorrect");
-        catch (char* info)
+    void
+        follicle::touch ( unsigned int pathway_num)
         {
-            std::cout<<info<<std::endl;
-            return;
-        }
-        // the output format is [c1_ligand1, c1_ligand2 ... c2_ligand1...]
+            set_path(pathway_num);
+            double templig=0, tempant=0;
+            for (unsigned int i = 0; i < bulge.size(); i++) 
+            {
 
-        for (int i = 0; i<num_lig[pathway_num]; i++)
-            io[i]=ligands[pathway_num][i+num_lig[pathway_num]*cycle];
-    }
+                templig=(lig_r[pathway_num].touch(i))*\\
+                        (paths.lig_aff()*paths.lig()[bulge[i].getidr()])+\\
+                        lig_r[pathway_num].data_now()[i]*paths().lig_off();
+                lig[bulge[i].getidr()]=-templig;
+                tempant=(ant_r[pathway_num].touch(i))*\\
+                        (paths.ant_aff()*paths.ant()[bulge[i].getidr()])+\\
+                        ant_r[pathway_num].data_now()[i]*paths().ant_off();
+                ant[bulge[i].getidr()]=-tempant;
+           }
 
-    void follicle::cur_antagonists (unsigned int pathway_num, double * io)
-    {
-        if ((sizeof (io)/sizeof (double))!=num_antagonists[pathway_num] \
-                || pathway_num>num_path)
-            throw ("access error: pathway size incorrect");
-        try
+           // get bulge positions and convert them to global index
+           // then get receptor affinity and receptor conc.
+            return ;
+        }		/* -----  end of function follicle::bind  ----- */
+    void
+        follicle::gen ( unsigned int pathway_num)
         {
-            if (antagonists[pathway_num]==NULL)
-            throw ("local storage array size incorrect");
-        }
-        catch (char* info)
+            set_path(pathway_num);
+            double templig=0, tempant=0;
+            for (unsigned int i = 0; i < bulge.size(); i++) 
+            {
+
+                templig=paths.gen_lig(1);
+                lig[bulge[i].getidr()]=templig;
+                tempant=paths.gen_ant(1);
+                ant[bulge[i].getidr()]=tempant;
+           }
+            for (unsigned int i = 0; i < top.size(); i++) 
+            {
+
+                templig=paths.gen_lig(0);
+                lig[top[i].getidr()]=templig;
+                tempant=paths.gen_ant(0);
+                ant[top[i].getidr()]=tempant;
+            }
+            for (unsigned int i = 0; i < prc.size(); i++) 
+            {
+
+                templig=paths.gen_lig(2);
+                lig[prc[i].getidr()]=templig;
+                tempant=paths.gen_ant(2);
+                ant[prc[i].getidr()]=tempant;
+            }
+            for (unsigned int i = 0; i < dp.size(); i++) 
+            {
+
+                templig=paths.gen_lig(3);
+                lig[dp[i].getidr()]=templig;
+                tempant=paths.gen_ant(3);
+                ant[dp[i].getidr()]=tempant;
+            }
+            return ;
+        }		/* -----  end of function follicle::bind  ----- */
+
+    void
+        follicle::bind ( unsigned int pathway_num )
         {
-            std::cout<<info<<std::endl;
-            return;
-        }
-        // the output format is [c1_ligand1, c1_ligand2 ... c2_ligand1...]
+            set_path(pathway_num);
+            double templig=0, tempant=0;
+            lig_r[pathway_num]++;
+            ant_r[pathway_num]++;
+            for (unsigned int i = 0; i < bulge.size(); i++) 
+            {
+               
+                templig=(lig_r[pathway_num].touch(i))*\\
+                        (paths.lig_aff()*paths.lig()[bulge[i].getidr()])+\\
+                        lig_r[pathway_num].data_now()[i]*paths().lig_off();
+                lig[bulge[i].getidr()]=-templig;
+                tempant=(ant_r[pathway_num].touch(i))*\\
+                        (paths.ant_aff()*paths.ant()[bulge[i].getidr()])+\\
+                        ant_r[pathway_num].data_now()[i]*paths().ant_off();
+                ant[bulge[i].getidr()]=-tempant;
 
-        for (int i = 0; i<num_antagonists[pathway_num]; i++)
-            io[i]=antagonists[pathway_num][i+num_antagonists[pathway_num]*cycle];
-    }
+                lig_r[pathway_num].write(i, templig,paths.lig_deg());
+                ant_r[pathway_num].write(i, tempant,paths.ant_deg());
+            }
 
-
-    void follicle::cur_active_receptors (unsigned int pathway_num, double * io)
-    {
-        if ((sizeof (io)/sizeof (double))!=num_receptor[pathway_num] \
-                || pathway_num>num_path)
-            throw ("access error: pathway size incorrect");
-        if (num_receptor[pathway_num]==NULL)
-            throw ("local storage array size incorrect");
-        catch (char* info)
-        {
-            std::cout<<info<<std::endl;
-            return;
-        }
-        // the output format is [c1_ligand1, c1_ligand2 ... c2_ligand1...]
-
-        for (int i = 0; i<num_receptor[pathway_num]; i++)
-            io[i]=active_receptors[pathway_num][i+num_receptor[pathway_num]*cycle];
-    }
-*/
-    void follicle::set_next_ligands (unsigned int pathway_num, double * io)
-    {
-        if ((sizeof (io)/sizeof (double))!=l1*l2*l3)
-            throw ("access error: pathway size incorrect");
-        if (ligands[pathway_num]==NULL)
-            throw ("local storage array size incorrect");
-        if (ligands[pathway_num][cycle]<0)
-            throw ("Wrong cycle number");
-
-        catch (char* info)
-        {
-            std::cout<<info<<std::endl;
-            return;
-        }
-        // the output format is [c1_ligand1, c1_ligand2 ... c2_ligand1...]
-
-        for (int i = 0; i<num_lig[pathway_num]; i++)
-            ligands[pathway_num][i+num_lig[pathway_num]*cycle]=io[i];
-    }
-
-    void follicle::set_next_antagonists (unsigned int pathway_num, double * io)
-    {
-        if ((sizeof (io)/sizeof (double))!=num_ang[pathway_num] \
-                || pathway_num>num_path)
-            throw ("access error: pathway size incorrect");
-        if (antagonists[pathway_num]==NULL)
-            throw ("local storage array size incorrect");
-        if (antagonists[pathway_num][cycle]<0)
-            throw ("Wrong cycle number");
-
-        catch (char* info)
-        {
-            std::cout<<info<<std::endl;
-            return;
-        }
-        // the output format is [c1_ligand1, c1_ligand2 ... c2_ligand1...]
-
-        for (int i = 0; i<num_ang[pathway_num]; i++)
-            antagonists[pathway_num][i+num_ang[pathway_num]*cycle]=io[i];
-    }
+            // get bulge positions and convert them to global index
+            // then get receptor affinity and receptor conc.
+            return ;
+        }		/* -----  end of function follicle::bind  ----- */
 }

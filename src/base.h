@@ -31,6 +31,8 @@ namespace fol
             unsigned int getx() {return d1};
             unsigned int gety() {return d2};
             unsigned int getz() {return d3};
+            unsigned int getidr(){return d3+l3*d2+l3*l2*d1};
+            unsigned int getidc(){return d1+l1*d2+l1*l2*d3};
             void get(unsigned int* io)
             {
                 if (size(io)/size(int)<3)
@@ -180,10 +182,11 @@ namespace fol
         public:
             /* ====================  LIFECYCLE     ======================================= */
             receptors ();                             /* constructor */
-            void init(unsigned int cycles, double rtot0)
+            void init(unsigned int cycles, double rtot0_in)
             {
-                src.resize(cycles);
                 data.resize(cycles);
+                rtot0=rtot0_in;
+                rtot=rtot0;
             };
             ~receptors();
             {
@@ -191,6 +194,7 @@ namespace fol
                     delete [] (*it);
             };
             /* ====================  ACCESSORS     ======================================= */
+            double rtot() {return rtot;};
             double* data(int cycle)
             {
                 return data[cycle];
@@ -200,13 +204,21 @@ namespace fol
                 return data[now];
             };
             unsigned int now(){return now;};
+            double touch(unsigned int i)
+            {
+                if (i>size(data_now)/size(double)) throw "Critical error: data vector overflow";
+                return rtot0-data_now()[i]; 
+            };
             /* ====================  MUTATORS      ======================================= */
-            void newsrc(std::vector<grid> in)
+            void newsrc(grid in)
             {
                 src.push_back(in);
                 //done! only need to inform not to copy src.
             };
-            
+            void write(unsigned int i,double d , double kdeg )
+            {
+                data_now()[i]=d-kdeg*data[now-1][i];
+            };
 
             /* ====================  OPERATORS     ======================================= */
             int operator++()
@@ -214,18 +226,22 @@ namespace fol
                 now++;
                 if (now>cycles) throw("Overflowing cycles!");
                 if (data[now]!=NULL) throw ("Uninitialized!")
-                if(src[now].size()==0) src[now]=src[now-1];
-                data[now]=new double [src[now].size()]; 
-                for (int i=0; i<src[cycle].size(); i++) data[now]=0;
+                data[now]=new double [src.size()]; 
+                for (int i=0; i<src.size(); i++) data[now][i]=data[now-1][i];
                 // Here each entry of src is a set of  
                 // sources (array of grid elements) which are copied by vector methods
                 // data is also copied accordingly. only need to del data for each
                 return now;
             };
 
-            double* operator[] (int cycle)
+            double operator[] (int cycle)
             {
-                return data(cycle);
+                double sum=0;
+                for (unsigned int j = 0; j < src.size(); j++) 
+                {
+                    sum+=data_now()[j];
+                }
+                return sum;
             };
 
         protected:
@@ -235,7 +251,7 @@ namespace fol
             std::vector<double*>::iterator it;
             unsigned int cycles, now;
             double rtot0, rtot;    
-            std::vector<std::vector<grid>> src;
+            std::vector<grid> src;
             std::vector<double*> data;
 
 
