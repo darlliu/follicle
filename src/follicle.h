@@ -1,16 +1,19 @@
-#include "headers.h"
+#ifndef GRANDFATHER_H
+#define GRANDFATHER_H
 
+#include "headers.h"
+#include "pathway.h"
 
 namespace fol
 {
     typedef enum 
     {
-        unknown = -1;
-        r_telo=0;
-        c_telo;
-        p_ana;
-        a_ana;
-        cata;
+        unknown = -1,
+        r_telo=0,
+        c_telo,
+        p_ana,
+        a_ana,
+        cata,
     } state;
 
     
@@ -30,12 +33,12 @@ namespace fol
             ~follicle();
             void init(unsigned int cycles_in) ;
             /* ====================  ACCESSORS     ======================================= */
-            states cur_states()
+            state cur_states()
             {
                 return states[cycle];
             };
             
-            states * all_states(){ return states; };
+			std::vector<state> all_states(){ return states; };
 
             //double* get_active_receptors(unsigned int pathway_num) 
                 //{return active_receptors[pathway_num];};
@@ -75,17 +78,19 @@ namespace fol
             {
                 ant=in;
             };
+			void
+			follicle::gen ( unsigned int pathway_num);
             void posit ( const unsigned int l11, const unsigned int l22, const unsigned int l33, unsigned int idx );
             void add_path ( pathway path );
             // set next data arrays
-            void generate_noise (double *mean_n, double *var_n, pathway_num);
+            void generate_noise (double *mean_n, double *var_n,unsigned int pathway_num);
             // given the guassian mean and variance of noise,
             // and the pathway number
             /* ====================  OPERATORS     ======================================= */
 
         protected:
             /* ====================  DATA MEMBERS  ======================================= */
-            const unsigned int cycles, l1,l2,l3, t_factor;
+            unsigned int cycles, l1,l2,l3, t_factor;
                                        // number of cycles, follicle index and global bounds
                                        // note: does not change
             unsigned int cycle, cnt, t;    // current cycle
@@ -126,3 +131,4 @@ namespace fol
     }; /* -----  end of class Follicle  ----- */
 
 }
+#endif

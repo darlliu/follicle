@@ -1,5 +1,5 @@
-﻿#include "headers.h"
-
+﻿#ifndef BASE_H
+#define BASE_H
 namespace fol
 {
     /*
@@ -18,24 +18,25 @@ namespace fol
                 d2=0;
                 d3=0;
             };
-            void init (direction_in, offset_in,l11,l22,l33)
+            void init (unsigned int direction_in,unsigned int  offset_in, \
+				unsigned int l11,unsigned int l22,unsigned int l33)
             {
                 direction=direction_in;
-                offset=offset_in;
+                offset=offset_in; 
                 l1=l11;
                 l2=l22;
                 l3=l33;
             };                             /* constructor */
 
             /* ====================  ACCESSORS     ======================================= */
-            unsigned int getx() {return d1};
-            unsigned int gety() {return d2};
-            unsigned int getz() {return d3};
+            unsigned int getx() {return d1;};
+            unsigned int gety() {return d2;};
+            unsigned int getz() {return d3;};
             unsigned int getidr(){return d3+l3*d2+l3*l2*d1};
             unsigned int getidc(){return d1+l1*d2+l1*l2*d3};
             void get(unsigned int* io)
             {
-                if (size(io)/size(int)<3)
+                if (sizeof(io)/sizeof(int)<3)
                     throw("Error: io parser size incorrect");
                 io[0]=d1;
                 io[1]=d2;
@@ -73,7 +74,7 @@ namespace fol
                         test1(d2,l2);
                     }
                 }
-                return this;
+                return *this;
             };
             grid& operator-- ()
             {
@@ -97,7 +98,7 @@ namespace fol
                     }
                     cur_offset--;
                 }
-                return this;
+                return *this;
             };
             grid& operator+ (int in)
             {
@@ -116,7 +117,7 @@ namespace fol
                 {
                     for (int i = 0; i< in; i++)
                         (*this)++;
-                    return this;
+                    return *this;
                 }
             };
 
@@ -128,25 +129,25 @@ namespace fol
                 {
                     for (int i = 0; i< in; i++)
                         (*this)--;
-                    return this;
+                    return *this;
                 }
             };
 
-            void test1(d&,l)
+            void test1(unsigned int d,unsigned int l)
             {
                 // does not protect against right boundary overflow on non-periodic z
                 if (d<l)
                     return;
                 else
                     if (l==0)
-                        continue;
+                        ;
                     else
                     {
                         d=0;
                     }
             };
 
-            void test2(d&,l)
+            void test2(unsigned int d,unsigned int l)
             {
                 if (d>0)
                     return;
@@ -206,7 +207,7 @@ namespace fol
             unsigned int now(){return now;};
             double touch(unsigned int i)
             {
-                if (i>size(data_now)/size(double)) throw "Critical error: data vector overflow";
+                if (i>sizeof(data_now())/sizeof(double)) throw "Critical error: data vector overflow";
                 return rtot0-data_now()[i]; 
             };
             /* ====================  MUTATORS      ======================================= */
@@ -225,7 +226,7 @@ namespace fol
             {
                 now++;
                 if (now>cycles) throw("Overflowing cycles!");
-                if (data[now]!=NULL) throw ("Uninitialized!")
+                if (data[now]!=NULL) throw ("Uninitialized!");
                 data[now]=new double [src.size()]; 
                 for (int i=0; i<src.size(); i++) data[now][i]=data[now-1][i];
                 // Here each entry of src is a set of  
@@ -259,3 +260,4 @@ namespace fol
 
 
 }
+#endif

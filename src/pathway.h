@@ -1,3 +1,6 @@
+#ifndef PATHWAY_H
+#define PATHWAY_H
+
 #include"headers.h"
 namespace fol
 {
@@ -15,7 +18,7 @@ namespace fol
             {
                 aff_lig=aff_ant=0;
                 g_lig=g_ant=0;
-                lig=ant=NULL;
+                lig=ant=0;
             };                             /* constructor */
             ~pathway ()
             {
@@ -73,7 +76,7 @@ namespace fol
 
         protected:
             /* ====================  DATA MEMBERS  ======================================= */
-            const unsigned int l1, l2, l3;
+            unsigned int l1, l2, l3;
             double aff_lig, aff_ant, off_lig, off_ant, eli, deg_lig, deg_ant;
             // reaction rates
             double g_lig, g_ant;
@@ -92,3 +95,4 @@ namespace fol
     }; /* -----  end of class Pathway  ----- */
 
 }
+#endif

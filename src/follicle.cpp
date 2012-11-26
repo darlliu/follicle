@@ -100,7 +100,7 @@ namespace fol
                         }
                         return;
                     }
-                case default:
+                default:
                     return;
             }
             // what more to do:
@@ -172,7 +172,7 @@ namespace fol
                         else
                             states[cycle]=cata;
                     }
-                case default:
+                default:
                     break;
             }
             if(t>t_factor)
