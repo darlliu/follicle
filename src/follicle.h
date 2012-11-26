@@ -74,8 +74,9 @@ namespace fol
             void set_next_antagonists (double *in)
             {
                 ant=in;
-
             };
+            void posit ( const unsigned int l11, const unsigned int l22, const unsigned int l33, unsigned int idx );
+            void add_path ( pathway path );
             // set next data arrays
             void generate_noise (double *mean_n, double *var_n, pathway_num);
             // given the guassian mean and variance of noise,
@@ -84,7 +85,7 @@ namespace fol
 
         protected:
             /* ====================  DATA MEMBERS  ======================================= */
-            const unsigned int cycles, index, l1,l2,l3, t_factor;
+            const unsigned int cycles, l1,l2,l3, t_factor;
                                        // number of cycles, follicle index and global bounds
                                        // note: does not change
             unsigned int cycle, cnt, t;    // current cycle
@@ -93,7 +94,6 @@ namespace fol
                                // number of ligands, antagonists, receptors as indexed by pathway number
                                // these are 1 by default
                                // they are unused as of now!
-            //int* path_type;     // pathway types, positive has greater
             bool major;         // whether to output data row major or column major
             unsigned int index; // index of follicle, convertible to (d1, d2, d3);
                                 // note: this shall become the element number (reordered) if meshed
@@ -109,7 +109,7 @@ namespace fol
             // for example in wnt dkk may be used with receptor as well
 
             pathway paths;
-            pathway *pathways;
+            std::vector<pathway> pathways;
             // handles to pathways
             double *lig, *ant;
             // collapsed data array -- big F vector

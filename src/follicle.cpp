@@ -10,7 +10,7 @@ namespace fol
         t=0;
         cycle=0;
         num_path = 0;
-        index=0;
+        //index=0;
         major=1; // default to column major
         paths=NULL;
         init(cycles_in);
@@ -24,7 +24,7 @@ namespace fol
         t=0;
         cycle=0;
         num_path = 0;
-        index=0;
+        //index=0;
         major=1; // default to column major
         paths=NULL;
     }
@@ -45,6 +45,31 @@ namespace fol
         return;
     }
 
+    void
+        follicle::posit ( const unsigned int l11, const unsigned int l22, const unsigned int l33, unsigned int idx )
+        {
+            index=idx;
+            l1=l11;
+            l2=l22;
+            l3=l33;
+            grid g1();
+            g1.init(1,2,l1,l2,l3);
+            g1.set(1,1,1);
+            //for test only
+            top.push_back(g1);
+            bulge.push_back(g1+5);
+            bulge.push_back(g1+6);
+            dp.push_back(g1+9);
+            dp.push_back(g1+10);
+            return ;
+        }		/* -----  end of function follicle::posit  ----- */
+    void
+        follicle::add_path ( pathway path )
+        {
+            num_path++;
+            pathways.push_back(path);
+            return ;
+        }		/* -----  end of function follicle::add_path  ----- */
     void
         follicle::grow (  )
         {
@@ -98,7 +123,7 @@ namespace fol
                     {
                         for (unsigned int i = 0; i < num_path; i++) 
                         {
-                            if (!paths[i].lig_thr(lig_r[i][cycle]))
+                            if (!pathways[i].lig_thr(lig_r[i][cycle]))
                             {
                                 states[cycle]=r_telo;
                                 break;
@@ -111,7 +136,7 @@ namespace fol
                     {
                         for (unsigned int i = 0; i < num_path; i++) 
                         {
-                            if (!paths[i].lig_thc(lig_r[i][cycle]))
+                            if (!pathways[i].lig_thc(lig_r[i][cycle]))
                             {
                                 states[cycle]=c_telo;
                                 break;
