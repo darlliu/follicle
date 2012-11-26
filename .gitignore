@@ -1,3 +1,5 @@
+vc/
+#ignore msvc files
 
 .DS_Store
 .swp
