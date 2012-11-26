@@ -18,7 +18,7 @@ namespace fol
                 d2=0;
                 d3=0;
             };
-            void init (unsigned int direction_in,unsigned int  offset_in, \
+            void init (bool direction_in,unsigned int  offset_in, \
 				unsigned int l11,unsigned int l22,unsigned int l33)
             {
                 direction=direction_in;
@@ -32,8 +32,8 @@ namespace fol
             unsigned int getx() {return d1;};
             unsigned int gety() {return d2;};
             unsigned int getz() {return d3;};
-            unsigned int getidr(){return d3+l3*d2+l3*l2*d1};
-            unsigned int getidc(){return d1+l1*d2+l1*l2*d3};
+            unsigned int getidr(){return d3+l3*d2+l3*l2*d1;};
+            unsigned int getidc(){return d1+l1*d2+l1*l2*d3;};
             void get(unsigned int* io)
             {
                 if (sizeof(io)/sizeof(int)<3)
@@ -189,8 +189,9 @@ namespace fol
                 rtot0=rtot0_in;
                 rtot=rtot0;
             };
-            ~receptors();
+            ~receptors()
             {
+
                 for (it=data.begin(); it<data.end(); it++)
                     delete [] (*it);
             };
@@ -249,7 +250,7 @@ namespace fol
             /* ====================  METHODS       ======================================= */
 
             /* ====================  DATA MEMBERS  ======================================= */
-            std::vector<double*>::iterator it;
+			std::vector<double*>::iterator it;
             unsigned int cycles, now;
             double rtot0, rtot;    
             std::vector<grid> src;
