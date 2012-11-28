@@ -41,8 +41,6 @@ namespace fol
 
 
             /* ====================  ACCESSORS     ======================================= */
-            double * lig(){return lig};
-            double * ant(){return ant};
             double gen_lig(unsigned int in)
             {
                 return g_lig;
@@ -51,10 +49,10 @@ namespace fol
             {
                 return g_ant;
             };
-            double lig_aff() {return aff_lig};
-            double ant_aff() {return aff_ant};
-            double lig_off() {return off_lig};
-            double ant_off() {return off_ant};
+            double lig_aff() {return aff_lig;};
+            double ant_aff() {return aff_ant;};
+            double lig_off() {return off_lig;};
+            double ant_off() {return off_ant;};
             
             bool lig_thr(double in)
             {
@@ -73,7 +71,8 @@ namespace fol
             /* ====================  MUTATORS      ======================================= */
             
             /* ====================  OPERATORS     ======================================= */
-
+			double *lig, *ant;
+            // data members
         protected:
             /* ====================  DATA MEMBERS  ======================================= */
             unsigned int l1, l2, l3;
@@ -85,8 +84,7 @@ namespace fol
             // receptor constants
             double thr1, thr2;
             // thresholds -- 0 means no check.
-            double *lig, *ant;
-            // data members
+
             
             
 

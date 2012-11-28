@@ -12,7 +12,7 @@ namespace fol
         num_path = 0;
         //index=0;
         major=1; // default to column major
-        paths=NULL;
+        pathway paths();
         init(cycles_in);
     }
 
@@ -26,7 +26,7 @@ namespace fol
         num_path = 0;
         //index=0;
         major=1; // default to column major
-        paths=NULL;
+        pathway paths();
     }
 
     void
@@ -123,7 +123,7 @@ namespace fol
                     {
                         for (unsigned int i = 0; i < num_path; i++) 
                         {
-                            if (!pathways[i].lig_thr(lig_r[i][cycle]))
+                            if (!pathways[i]->lig_thr(lig_r[i][cycle]))
                             {
                                 states[cycle]=r_telo;
                                 break;
@@ -136,7 +136,7 @@ namespace fol
                     {
                         for (unsigned int i = 0; i < num_path; i++) 
                         {
-                            if (!pathways[i].lig_thc(lig_r[i][cycle]))
+                            if (!pathways[i]->lig_thc(lig_r[i][cycle]))
                             {
                                 states[cycle]=c_telo;
                                 break;
@@ -192,13 +192,13 @@ namespace fol
             for (unsigned int i = 0; i < bulge.size(); i++) 
             {
 
-                templig=(lig_r[pathway_num].touch(i))*\\
-                        (paths.lig_aff()*paths.lig()[bulge[i].getidr()])+\\
-                        lig_r[pathway_num].data_now()[i]*paths().lig_off();
+                templig=(lig_r[pathway_num].touch(i))*\
+                        (paths->lig_aff()*paths->lig[bulge[i].getidr()])+\
+                        lig_r[pathway_num].data_now()[i]*paths->lig_off();
                 lig[bulge[i].getidr()]=-templig;
-                tempant=(ant_r[pathway_num].touch(i))*\\
-                        (paths.ant_aff()*paths.ant()[bulge[i].getidr()])+\\
-                        ant_r[pathway_num].data_now()[i]*paths().ant_off();
+                tempant=(ant_r[pathway_num].touch(i))*\
+                        (paths->ant_aff()*paths->ant[bulge[i].getidr()])+\
+                        ant_r[pathway_num].data_now()[i]*paths->ant_off();
                 ant[bulge[i].getidr()]=-tempant;
            }
 
@@ -214,33 +214,33 @@ namespace fol
             for (unsigned int i = 0; i < bulge.size(); i++) 
             {
 
-                templig=paths.gen_lig(1);
+                templig=paths->gen_lig(1);
                 lig[bulge[i].getidr()]=templig;
-                tempant=paths.gen_ant(1);
+                tempant=paths->gen_ant(1);
                 ant[bulge[i].getidr()]=tempant;
            }
             for (unsigned int i = 0; i < top.size(); i++) 
             {
 
-                templig=paths.gen_lig(0);
+                templig=paths->gen_lig(0);
                 lig[top[i].getidr()]=templig;
-                tempant=paths.gen_ant(0);
+                tempant=paths->gen_ant(0);
                 ant[top[i].getidr()]=tempant;
             }
             for (unsigned int i = 0; i < prc.size(); i++) 
             {
 
-                templig=paths.gen_lig(2);
+                templig=paths->gen_lig(2);
                 lig[prc[i].getidr()]=templig;
-                tempant=paths.gen_ant(2);
+                tempant=paths->gen_ant(2);
                 ant[prc[i].getidr()]=tempant;
             }
             for (unsigned int i = 0; i < dp.size(); i++) 
             {
 
-                templig=paths.gen_lig(3);
+                templig=paths->gen_lig(3);
                 lig[dp[i].getidr()]=templig;
-                tempant=paths.gen_ant(3);
+                tempant=paths->gen_ant(3);
                 ant[dp[i].getidr()]=tempant;
             }
             return ;
@@ -256,17 +256,17 @@ namespace fol
             for (unsigned int i = 0; i < bulge.size(); i++) 
             {
                
-                templig=(lig_r[pathway_num].touch(i))*\\
-                        (paths.lig_aff()*paths.lig()[bulge[i].getidr()])+\\
-                        lig_r[pathway_num].data_now()[i]*paths().lig_off();
+                templig=(lig_r[pathway_num].touch(i))*\
+                        (paths->lig_aff()*paths->lig[bulge[i].getidr()])+\
+                        lig_r[pathway_num].data_now()[i]*paths->lig_off();
                 lig[bulge[i].getidr()]=-templig;
-                tempant=(ant_r[pathway_num].touch(i))*\\
-                        (paths.ant_aff()*paths.ant()[bulge[i].getidr()])+\\
-                        ant_r[pathway_num].data_now()[i]*paths().ant_off();
+                tempant=(ant_r[pathway_num].touch(i))*\
+                        (paths->ant_aff()*paths->ant[bulge[i].getidr()])+\
+                        ant_r[pathway_num].data_now()[i]*paths->ant_off();
                 ant[bulge[i].getidr()]=-tempant;
 
-                lig_r[pathway_num].write(i, templig,paths.lig_deg());
-                ant_r[pathway_num].write(i, tempant,paths.ant_deg());
+                lig_r[pathway_num].write(i, templig,paths->lig_deg());
+                ant_r[pathway_num].write(i, tempant,paths->ant_deg());
             }
 
             // get bulge positions and convert them to global index

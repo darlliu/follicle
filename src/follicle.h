@@ -113,8 +113,8 @@ namespace fol
             // the second receptor vector is optional
             // for example in wnt dkk may be used with receptor as well
 
-            pathway paths;
-            std::vector<pathway> pathways;
+            pathway *paths;
+            std::vector<pathway*> pathways;
             // handles to pathways
             double *lig, *ant;
             // collapsed data array -- big F vector
