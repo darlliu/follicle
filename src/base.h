@@ -14,15 +14,14 @@ namespace fol
             /* ====================  LIFECYCLE     ======================================= */
             grid()
             {
-                d1=0;
-                d2=0;
-                d3=0;
+				d1=d2=d3=0;
             };
             void init (bool direction_in,unsigned int  offset_in, \
 				unsigned int l11,unsigned int l22,unsigned int l33)
             {
                 direction=direction_in;
                 offset=offset_in; 
+				cur_offset=offset;
                 l1=l11;
                 l2=l22;
                 l3=l33;
@@ -52,8 +51,9 @@ namespace fol
 
             /* ====================  OPERATORS     ======================================= */
 
-            grid& operator++ ()
+            grid operator++ ()
             {
+				//std::cout<<"Grid plusplus routine"<<cur_offset;
                 if(cur_offset==0)
                 {
                     d3++;
@@ -76,8 +76,10 @@ namespace fol
                 }
                 return *this;
             };
-            grid& operator-- ()
+            grid operator-- ()
             {
+				//std::cout<<"Grid minusminus routine"<<cur_offset<<std::endl;
+
                 if(cur_offset==0)
                 {
                     d3--;
@@ -100,40 +102,40 @@ namespace fol
                 }
                 return *this;
             };
-            grid& operator+ (int in)
+            grid operator+ (int in)
             {
                 return plus(in);
             };
-            grid& operator- (int in)
+            grid operator- (int in)
             {
                 return minus (in);
             };
             /* ====================  METHODS       ======================================= */
-            grid& plus (int in)
+            grid plus (int in)
             {
                 if (in<0)
                     return minus (-in);
                 else
                 {
                     for (int i = 0; i< in; i++)
-                        (*this)++;
+                        ++(*this);
                     return *this;
                 }
             };
 
-            grid& minus (int in)
+            grid minus (int in)
             {
                 if (in<0)
                     return plus (-in);
                 else
                 {
                     for (int i = 0; i< in; i++)
-                        (*this)--;
+                        --(*this);
                     return *this;
                 }
             };
 
-            void test1(unsigned int d,unsigned int l)
+            void test1(unsigned int &d,unsigned int l)
             {
                 // does not protect against right boundary overflow on non-periodic z
                 if (d<l)
@@ -147,7 +149,7 @@ namespace fol
                     }
             };
 
-            void test2(unsigned int d,unsigned int l)
+            void test2(unsigned int &d,unsigned int l)
             {
                 if (d>0)
                     return;
@@ -162,7 +164,8 @@ namespace fol
 
         protected:
             /* ====================  METHODS       ======================================= */
-            unsigned int offset, cur_offset, d1, d2, d3, l1, l2, l3;
+            static unsigned offset,  l1, l2, l3;
+			unsigned cur_offset,d1, d2, d3;
             bool direction;
             /* ====================  DATA MEMBERS  ======================================= */
 
@@ -185,27 +188,25 @@ namespace fol
             receptors ();                             /* constructor */
             void init(unsigned int cycles, double rtot0_in)
             {
-                data.resize(cycles);
-                rtot0=rtot0_in;
-                rtot=rtot0;
+                this->data.resize(cycles);
+                this->rtot0=rtot0_in;
+                this->rtot=rtot0;
             };
             ~receptors()
             {
 
-                for (it=data.begin(); it<data.end(); it++)
+                for (it=this->data.begin(); it<this->data.end(); it++)
                     delete [] (*it);
             };
             /* ====================  ACCESSORS     ======================================= */
-            double rtot() {return rtot;};
-            double* data(int cycle)
+            double* data_at(int cycle)
             {
                 return data[cycle];
             };
             double* data_now()
             {
-                return data[now];
+                return this->data[this->now];
             };
-            unsigned int now(){return now;};
             double touch(unsigned int i)
             {
                 if (i>sizeof(data_now())/sizeof(double)) throw "Critical error: data vector overflow";
@@ -217,7 +218,7 @@ namespace fol
                 src.push_back(in);
                 //done! only need to inform not to copy src.
             };
-            void write(unsigned int i,double d , double kdeg )
+            void write(unsigned int i, double d , double kdeg )
             {
                 data_now()[i]=d-kdeg*data[now-1][i];
             };
@@ -227,9 +228,9 @@ namespace fol
             {
                 now++;
                 if (now>cycles) throw("Overflowing cycles!");
-                if (data[now]!=NULL) throw ("Uninitialized!");
+                if (data[now]!=NULL) throw ("Already initialized!");
                 data[now]=new double [src.size()]; 
-                for (int i=0; i<src.size(); i++) data[now][i]=data[now-1][i];
+                for (unsigned i=0; i<src.size(); i++) data[now][i]=data[now-1][i];
                 // Here each entry of src is a set of  
                 // sources (array of grid elements) which are copied by vector methods
                 // data is also copied accordingly. only need to del data for each

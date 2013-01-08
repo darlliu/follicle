@@ -1,5 +1,5 @@
-#ifndef GRANDFATHER_H
-#define GRANDFATHER_H
+#ifndef FOLLICLE_H
+#define FOLLICLE_H
 
 #include "headers.h"
 #include "pathway.h"
@@ -21,7 +21,10 @@ namespace fol
     /*
      * =====================================================================================
      *        Class:  follicle
-     *  Description:  a class of follicles with predefined pathways and data members.
+     *  Description:  a class of follicles with predefined pathways and data members,
+	 *				  has three main functions: keep track of growth state, perform binding
+					  and generation routine and query all pathways to obtain a finalized F
+					  vector for whole system
      * =====================================================================================
      */
     class follicle
@@ -32,6 +35,7 @@ namespace fol
             follicle ();
             ~follicle();
             void init(unsigned int cycles_in) ;
+
             /* ====================  ACCESSORS     ======================================= */
             state cur_states()
             {
@@ -68,7 +72,7 @@ namespace fol
             
             void write(unsigned int pathway_num);
 
-            void touch(unsigned int pathway_num);
+            void touch(unsigned int pathway_num, double* F_lig, double * F_ant);
 
             void set_next_ligands ( double *in)
             {
@@ -78,28 +82,28 @@ namespace fol
             {
                 ant=in;
             };
-			void
-			follicle::gen ( unsigned int pathway_num);
-            void posit ( const unsigned int l11, const unsigned int l22, const unsigned int l33, unsigned int idx );
-            void add_path ( pathway path );
+			void gen ( unsigned int pathway_num);
+            void posit (const unsigned i, const unsigned j, const unsigned k, unsigned int idx );
+            void add_path ( pathway *path );
             // set next data arrays
             void generate_noise (double *mean_n, double *var_n,unsigned int pathway_num);
             // given the guassian mean and variance of noise,
             // and the pathway number
             /* ====================  OPERATORS     ======================================= */
-
-        protected:
-            /* ====================  DATA MEMBERS  ======================================= */
-            unsigned int cycles, l1,l2,l3, t_factor;
+            static unsigned int cycles, l1,l2,l3, t_factor;
                                        // number of cycles, follicle index and global bounds
                                        // note: does not change
+			static bool major;         // whether to output data row major or column major
+        protected:
+            /* ====================  DATA MEMBERS  ======================================= */
+
             unsigned int cycle, cnt, t;    // current cycle
-            unsigned int num_path; //total number of pathways
+            static unsigned int num_path; //total number of pathways
             //std::vector<unsigned int> num_lig, num_ang, num_receptor;
                                // number of ligands, antagonists, receptors as indexed by pathway number
                                // these are 1 by default
                                // they are unused as of now!
-            bool major;         // whether to output data row major or column major
+
             unsigned int index; // index of follicle, convertible to (d1, d2, d3);
                                 // note: this shall become the element number (reordered) if meshed
             std::vector<grid> top, bulge, dp, prc;

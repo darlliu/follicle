@@ -2,31 +2,35 @@
 
 namespace fol
 {
+	    unsigned grid::offset=2, grid::l1=0, grid::l2=0, grid::l3=0;
+	
+		unsigned int follicle::cycles=0,
+        follicle::t_factor=20,
+		follicle::l1=15,follicle::l2=15,follicle::l3=15,
+        follicle::num_path = 0;
+
+        //index=0;
+        bool follicle::major=1; // default to column major
+	
+
     follicle::follicle(unsigned int cycles_in)
     {
-        cycles=0;
-        t_factor=20;
-        cnt=0;
-        t=0;
-        cycle=0;
-        num_path = 0;
-        //index=0;
-        major=1; // default to column major
-        pathway paths();
+		cnt=0;
+		cycle=0;
+		t=0;
         init(cycles_in);
     }
 
+	follicle::~follicle()
+	{
+	}
+
+
     follicle::follicle ()
     {
-        cycles=0;
-        t_factor=20;
-        cnt=0;
-        t=0;
-        cycle=0;
-        num_path = 0;
-        //index=0;
-        major=1; // default to column major
-        pathway paths();
+		t=0;
+		cnt=0;
+		cycle=0;
     }
 
     void
@@ -34,37 +38,41 @@ namespace fol
     {
         cycles=cycles_in;
         states.resize(cycles);
-        for (int i = 0; i<cycles; i++)
+        for (unsigned i = 0; i<cycles; i++)
         {
             states[i]=unknown;
         }// initialize the states
-        top.resize(cycles);
+        /*
+		top.resize(cycles);
         dp.resize(cycles);
         bulge.resize(cycles);
         prc.resize(cycles);
+		*/
         return;
     }
 
     void
-        follicle::posit ( const unsigned int l11, const unsigned int l22, const unsigned int l33, unsigned int idx )
+        follicle::posit ( const unsigned i, const unsigned j, const unsigned k, unsigned int idx )
         {
             index=idx;
-            l1=l11;
-            l2=l22;
-            l3=l33;
-            grid g1();
-            g1.init(1,2,l1,l2,l3);
-            g1.set(1,1,1);
+            grid* g1= new grid();
+            g1->init(1,2,l1,l2,l3);
+            g1->set(i,j,k);
             //for test only
-            top.push_back(g1);
-            bulge.push_back(g1+5);
-            bulge.push_back(g1+6);
-            dp.push_back(g1+9);
-            dp.push_back(g1+10);
+            top.push_back(*g1);
+            bulge.push_back((*g1)+5);
+            bulge.push_back((*g1)+6);
+            dp.push_back(*g1+9);
+            dp.push_back(*g1+10);
+			prc.push_back((*g1)+7);
+			prc.push_back((*g1)+8);
+			delete g1;
+			//std::cout<<prc[0].gety()<<"\t"<<top[0].gety()<<std::endl;
+
             return ;
         }		/* -----  end of function follicle::posit  ----- */
     void
-        follicle::add_path ( pathway path )
+        follicle::add_path ( pathway *path )
         {
             num_path++;
             pathways.push_back(path);
@@ -86,7 +94,7 @@ namespace fol
                     {
                         for (unsigned int i = 0; i < dp.size(); i++) 
                         {
-                            dp[i]++;
+                            ++dp[i];
                         }
                         return;
                     }
@@ -96,7 +104,7 @@ namespace fol
                     {
                         for (unsigned int i = 0; i < dp.size(); i++) 
                         {
-                            dp[i]--;
+                            --dp[i];
                         }
                         return;
                     }
@@ -185,7 +193,7 @@ namespace fol
         }		/* -----  end of function follicle::evolve  ----- */
 
     void
-        follicle::touch ( unsigned int pathway_num)
+        follicle::touch ( unsigned int pathway_num, double* F_lig, double * F_ant)
         {
             set_path(pathway_num);
             double templig=0, tempant=0;
@@ -195,11 +203,11 @@ namespace fol
                 templig=(lig_r[pathway_num].touch(i))*\
                         (paths->lig_aff()*paths->lig[bulge[i].getidr()])+\
                         lig_r[pathway_num].data_now()[i]*paths->lig_off();
-                lig[bulge[i].getidr()]=-templig;
+                F_lig[bulge[i].getidr()]=-templig;
                 tempant=(ant_r[pathway_num].touch(i))*\
                         (paths->ant_aff()*paths->ant[bulge[i].getidr()])+\
                         ant_r[pathway_num].data_now()[i]*paths->ant_off();
-                ant[bulge[i].getidr()]=-tempant;
+                F_ant[bulge[i].getidr()]=-tempant;
            }
 
            // get bulge positions and convert them to global index
@@ -227,7 +235,8 @@ namespace fol
                 tempant=paths->gen_ant(0);
                 ant[top[i].getidr()]=tempant;
             }
-            for (unsigned int i = 0; i < prc.size(); i++) 
+            if (states[cycle]==p_ana || states[cycle]==a_ana)
+				for (unsigned int i = 0; i < prc.size(); i++) 
             {
 
                 templig=paths->gen_lig(2);
@@ -251,8 +260,8 @@ namespace fol
         {
             set_path(pathway_num);
             double templig=0, tempant=0;
-            lig_r[pathway_num]++;
-            ant_r[pathway_num]++;
+            ++lig_r[pathway_num];
+            ++ant_r[pathway_num];
             for (unsigned int i = 0; i < bulge.size(); i++) 
             {
                

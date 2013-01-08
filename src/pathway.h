@@ -7,7 +7,8 @@ namespace fol
     /*
      * =====================================================================================
      *        Class:  pathway
-     *  Description:  
+     *  Description:  a class of pathways to contain first parameters of the system and then
+	 *				  also perform ligand pass-through routines to each follicle
      * =====================================================================================
      */
     class pathway
@@ -16,8 +17,10 @@ namespace fol
             /* ====================  LIFECYCLE     ======================================= */
             pathway ()
             {
-                aff_lig=aff_ant=0;
-                g_lig=g_ant=0;
+				rxn_rates.resize(7);
+				gen_rates.resize(2);
+				receptor_consts.resize(2);
+				thresholds.resize(2);
                 lig=ant=0;
             };                             /* constructor */
             ~pathway ()
@@ -43,18 +46,25 @@ namespace fol
             /* ====================  ACCESSORS     ======================================= */
             double gen_lig(unsigned int in)
             {
-                return g_lig;
+                return gen_rates[0];
             };
-            double ant_lig(unsigned int in)
+            double gen_ant(unsigned int in)
             {
-                return g_ant;
+                return gen_rates[1];
             };
-            double lig_aff() {return aff_lig;};
-            double ant_aff() {return aff_ant;};
-            double lig_off() {return off_lig;};
-            double ant_off() {return off_ant;};
+            double lig_aff() {return rxn_rates[0];};
+            double ant_aff() {return rxn_rates[1];};
+            double lig_off() {return rxn_rates[2];};
+            double ant_off() {return rxn_rates[3];};
             
             bool lig_thr(double in)
+            {
+                if (in>0) {
+                    return 1;
+                }
+                else return 0;
+            };
+			bool lig_thc(double in)
             {
                 if (in>0) {
                     return 1;
@@ -68,21 +78,45 @@ namespace fol
                 }
                 else return 0;
             };
+			double lig_deg()
+			{
+				return rxn_rates[4];
+			};
+			double ant_deg()
+			{
+				return rxn_rates[5];
+			};
+
+
+
             /* ====================  MUTATORS      ======================================= */
-            
+            void anil()
+				//antagonist anniliation part
+			{
+				double temp;
+				for (unsigned i = 0; i < l1*l2*l3; i++)
+				{
+					temp=lig[i]*ant[i]*rxn_rates[6];
+					ant[i]-=temp;
+					lig[i]-=temp;
+				}
+			};
+
+
             /* ====================  OPERATORS     ======================================= */
 			double *lig, *ant;
             // data members
-        protected:
             /* ====================  DATA MEMBERS  ======================================= */
-            unsigned int l1, l2, l3;
-            double aff_lig, aff_ant, off_lig, off_ant, eli, deg_lig, deg_ant;
+            static unsigned int l1, l2, l3;
+			// grid size, note: only these are statics
+            std::vector<double> rxn_rates,gen_rates,receptor_consts,thresholds;
+			//double aff_lig, aff_ant, off_lig, off_ant,  deg_lig, deg_ant, elimination rate;
             // reaction rates
-            double g_lig, g_ant;
+            //double g_lig, g_ant;
             // generation rates
-            double rtot0_lig, rtot0_ant;
+            //double rtot0_lig, rtot0_ant;
             // receptor constants
-            double thr1, thr2;
+            //double thr1, thr2;
             // thresholds -- 0 means no check.
 
             
