@@ -2,9 +2,9 @@ vc/
 #ignore msvc files
 
 .DS_Store
-.swp
-.swo
-.avi
+*.swp
+*.swo
+*.avi
 # Compiled Object files
 *.slo
 *.lo
